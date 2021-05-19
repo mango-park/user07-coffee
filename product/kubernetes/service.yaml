@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: product
+  namespace: coffee
+  labels:
+    app: product
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: product
+  type: LoadBalancer
