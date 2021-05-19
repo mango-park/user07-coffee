@@ -27,7 +27,7 @@ spring:
         - id: report
           uri: http://localhost:8085
           predicates:
-            - Path= /orderlists/**
+            - Path= /reports/**
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -66,7 +66,7 @@ spring:
         - id: report
           uri: http://report:8080
           predicates:
-            - Path= /orderlists/**
+            - Path= /reports/**
       globalcors:
         corsConfigurations:
           '[/**]':
