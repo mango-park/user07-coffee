@@ -15,8 +15,6 @@ public class CustomerController {
 
         @RequestMapping(value = "/customers/checkAndModifyPoint", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 
-        // public boolean checkAndModifyPoint(HttpServletRequest request,
-        // HttpServletResponse response)
         public boolean checkAndModifyPoint(@RequestParam("customerId") Long customerId,
                         @RequestParam("price") Integer price) throws Exception {
                 System.out.println("##### /customer/checkAndModifyPoint  called #####");
@@ -32,7 +30,5 @@ public class CustomerController {
                 }
 
                 return result;
-
         }
-
 }

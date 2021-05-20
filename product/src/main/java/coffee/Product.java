@@ -2,37 +2,32 @@ package coffee;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
-import java.util.List;
-import java.util.Date;
 
 @Entity
-@Table(name="Product_table")
+@Table(name = "Product_table")
 public class Product {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Integer price;
     private String productStatus;
 
     @PostPersist
-    public void onPostPersist(){
+    public void onPostPersist() {
         RegisteredProduct registeredProduct = new RegisteredProduct();
         BeanUtils.copyProperties(this, registeredProduct);
         registeredProduct.publishAfterCommit();
 
-
     }
 
     @PrePersist
-    public void onPrePersist(){
+    public void onPrePersist() {
         CheckedProductStatus checkedProductStatus = new CheckedProductStatus();
         BeanUtils.copyProperties(this, checkedProductStatus);
         checkedProductStatus.publishAfterCommit();
 
-
     }
-
 
     public Long getId() {
         return id;
@@ -57,8 +52,5 @@ public class Product {
     public void setProductStatus(String productStatus) {
         this.productStatus = productStatus;
     }
-
-
-
 
 }

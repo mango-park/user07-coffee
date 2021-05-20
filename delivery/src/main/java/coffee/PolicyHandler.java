@@ -12,38 +12,37 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PolicyHandler{
+public class PolicyHandler {
 
     @Autowired
     DeliveryRepository deliveryRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void onStringEventListener(@Payload String eventString){
+    public void onStringEventListener(@Payload String eventString) {
 
     }
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrdered_WaitOrder(@Payload Ordered ordered){
+    public void wheneverOrdered_WaitOrder(@Payload Ordered ordered) {
 
-        if(ordered.isMe()){
+        if (ordered.isMe()) {
             System.out.println("##### listener WaitOrder : " + ordered.toJson());
             System.out.println();
             System.out.println();
 
-//Edited Source
-            // Optional<Delivery> deliveryCompleted = deliveryRepository.findByStatus("Completed");   
+            // Edited Source
+            // Optional<Delivery> deliveryCompleted =
+            // deliveryRepository.findByStatus("Completed");
             // Long total_count = deliveryRepository.count();
-//          Long completed_count = deliveryCompleted.
+            // Long completed_count = deliveryCompleted.
             // System.out.println(total_count);
             // System.out.println(deliveryCompleted);
-
-  
 
             Delivery delivery = new Delivery();
             delivery.setOrderId(ordered.getId());
             delivery.setStatus("Waited");
 
-            deliveryRepository.save(delivery);     
+            deliveryRepository.save(delivery);
 
         }
     }
