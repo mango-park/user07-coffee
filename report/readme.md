@@ -1,15 +1,15 @@
+# 1조 프로젝트 : SirenOrder
+
 ![image](https://user-images.githubusercontent.com/74900977/118920002-81cb6b80-b970-11eb-8ca7-a5e62d96a77e.png)
 
-# 예제 - 음식배달
+SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설계/구현/운영 전단계를 커버하도록 구성한 프로젝트임
 
-본 예제는 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설계/구현/운영 전단계를 커버하도록 구성한 예제입니다.
-이는 클라우드 네이티브 애플리케이션의 개발에 요구되는 체크포인트들을 통과하기 위한 예시 답안을 포함합니다.
-- 체크포인트 : https://workflowy.com/s/assessment-check-po/T5YrzcMewfo4J6LW
+- 체크포인트 : https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 
 
 # Table of contents
 
-- [예제 - 음식배달](#---)
+- [예제 - SirenOrder](#---)
   - [서비스 시나리오](#서비스-시나리오)
   - [체크포인트](#체크포인트)
   - [분석/설계](#분석설계)
@@ -28,27 +28,25 @@
 
 # 서비스 시나리오
 
-배달의 민족 커버하기 - https://1sung.tistory.com/106
+[ 기능적 요구사항 ]
+1. 고객이 회원 가입을 한다
+2. 신규 회원 가입을 한 고객에게 포인트를 적립해 준다(신규 회원 가입 포인트 : ?? )
+3. 고객이 주문하기 전에 주문 가능한 상품 메뉴를 선택한다
+4. 고객이 선택한 메뉴에 대해서 주문을 한다
+5. 주문이 되면 주문 내역이 Delivery 서비스에 전달되고, 고객 포인트를 적립한다
+6. 접수된 주문은 Wating 상태로 접수가 되고, 고객한테 접수 대기 번호를 발송한다
+7. 주문한 상품이 완료되면 고객한테 상품 주문 완료를 전달한다
+8. 상점 주인에게 주문/매출 정보를 조회할수 있는 Report 서비스를 제공한다.
 
-기능적 요구사항
-1. 고객이 메뉴를 선택하여 주문한다
-1. 고객이 결제한다
-1. 주문이 되면 주문 내역이 입점상점주인에게 전달된다
-1. 상점주인이 확인하여 요리해서 배달 출발한다
-1. 고객이 주문을 취소할 수 있다
-1. 주문이 취소되면 배달이 취소된다
-1. 고객이 주문상태를 중간중간 조회한다
-1. 주문상태가 바뀔 때 마다 카톡으로 알림을 보낸다
-
-비기능적 요구사항
+[ 비기능적 요구사항 ]
 1. 트랜잭션
-    1. 결제가 되지 않은 주문건은 아예 거래가 성립되지 않아야 한다  Sync 호출 
+    1. 판매가 가능한 상품 정보만 주문 메뉴에 노출한다  Sync 호출 
 1. 장애격리
-    1. 상점관리 기능이 수행되지 않더라도 주문은 365일 24시간 받을 수 있어야 한다  Async (event-driven), Eventual Consistency
-    1. 결제시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도한다  Circuit breaker, fallback
+    1. Delivery 서비스가 중단되더라도 주문은 365일 24시간 받을 수 있어야 한다  Async (event-driven), Eventual Consistency
+    1. 주문이 완료된 상품이 Delivery 서비스가 과중되더라도 주문 완료 정보를 Delivery 서비스가 정상화 된 이후에 수신한다 Circuit breaker, fallback
 1. 성능
-    1. 고객이 자주 상점관리에서 확인할 수 있는 배달상태를 주문시스템(프론트엔드)에서 확인할 수 있어야 한다  CQRS
-    1. 배달상태가 바뀔때마다 카톡 등으로 알림을 줄 수 있어야 한다  Event driven
+    1. 상점 주인은 Report 서비스를 통해서 확인할 수 있어야 한다  CQRS
+    1. 주문 접수 상태가 바뀔때마다 고객에게 알림을 줄 수 있어야 한다  Event driven
 
 
 # 체크포인트
@@ -120,7 +118,7 @@
 
 
 ## Event Storming 결과
-* MSAEz 로 모델링한 이벤트스토밍 결과:  http://msaez.io/#/storming/nZJ2QhwVc4NlVJPbtTkZ8x9jclF2/every/a77281d704710b0c2e6a823b6e6d973a/-M5AV2z--su_i4BfQfeF
+* MSAEz 로 모델링한 이벤트스토밍 결과:  http://www.msaez.io/#/storming/f2NszwGXcITtKN4MrX4BrDurru12/share/99c158ed8a4d29f04a25679ea2240382
 
 
 ### 이벤트 도출
