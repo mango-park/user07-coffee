@@ -37,8 +37,7 @@ phases:
       - echo connect kubectl
       - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
       - kubectl config set-credentials admin --token="$KUBE_TOKEN"
-      - kubectl config set-context default --cluster=k8s --user=admin
-      - kubectl config use-context default
+      - kubectl config use-context coffee
       - |
         cat <<EOF | kubectl apply -f -
         apiVersion: v1
