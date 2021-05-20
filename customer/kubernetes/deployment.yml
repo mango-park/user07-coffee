@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: customer
-          image: username/customer:latest
+          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer:v1
           ports:
             - containerPort: 8080
           readinessProbe:
