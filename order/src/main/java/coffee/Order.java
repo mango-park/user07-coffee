@@ -16,14 +16,14 @@ public class Order {
     private Long id;
     private Long customerId;
     private Long productId;
-    @ColumnDefault("'ordered'")
+    @ColumnDefault("'Ordered'")
     private String status;
     private Integer waitingNumber;
 
     @PrePersist
     public void onPrePersist() throws Exception {
         this.waitingNumber = OrderApplication.applicationContext.getBean(coffee.OrderRepository.class)
-                .countByStatus("waited");
+                .countByStatus("Waited");
         System.out.println(this.waitingNumber);
     }
 
@@ -35,7 +35,7 @@ public class Order {
 
         if (price > 0) {
             boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
-                    .checkAndModifyPoint(this.getCustomerId(), 100);
+                    .checkAndModifyPoint(this.getCustomerId(), price);
 
             if (result) {
 
