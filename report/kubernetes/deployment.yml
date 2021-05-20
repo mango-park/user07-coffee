@@ -15,6 +15,10 @@ spec:
       labels:
         app: report
     spec:
+      #volumes:
+      #  - name: persistent-storage
+      #    persistentVolumeClaim:
+      #      claimName: efs-claim
       containers:
         - name: report
           image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/report:v5
@@ -39,3 +43,6 @@ spec:
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 5
+          #volumeMounts:
+          #  - name: persistent-storage
+          #    mountPath: /data

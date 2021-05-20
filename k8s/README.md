@@ -145,4 +145,4 @@ HPA 적용
 
 ConfigMap
 
-    kubectl apply -f /Users/joonhopark/workspace/study/coffee/report/kubernetes/report-configmap.yml
+    kubectl apply -f /Users/joonhopark/workspace/study/coffee/k8s/report-configmap.yml
