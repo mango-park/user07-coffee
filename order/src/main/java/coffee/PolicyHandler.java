@@ -37,40 +37,6 @@ public class PolicyHandler {
     }
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverDeliveryCompleted_UpdateStatus(@Payload DeliveryCompleted deliveryCompleted) {
-
-        if (deliveryCompleted.isMe()) {
-            System.out.println("##### listener UpdateStatus : " + deliveryCompleted.toJson());
-            System.out.println();
-            System.out.println();
-            // Edited Source
-            Optional<Order> orderOptional = orderRepository.findById(deliveryCompleted.getOrderId());
-            Order order = orderOptional.get();
-            order.setStatus(deliveryCompleted.getStatus());
-
-            orderRepository.save(order);
-        }
-    }
-
-    @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrderReceived_UpdateStatus(@Payload OrderReceived orderReceived) {
-
-        if (orderReceived.isMe()) {
-            System.out.println("##### listener UpdateStatus : " + orderReceived.toJson());
-            System.out.println();
-            System.out.println();
-
-            // Edited Source
-            Optional<Order> orderOptional = orderRepository.findById(orderReceived.getOrderId());
-            Order order = orderOptional.get();
-            order.setStatus(orderReceived.getStatus());
-
-            orderRepository.save(order);
-
-        }
-    }
-
-    @StreamListener(KafkaProcessor.INPUT)
     public void wheneverStatusUpdated_UpdateStatus(@Payload StatusUpdated statusUpdated) {
 
         if (statusUpdated.isMe()) {

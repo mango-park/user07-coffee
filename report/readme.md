@@ -104,7 +104,9 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 
 
 
-## 헥사고날 아키텍처 다이어그램 도출 ( TBD )
+## 헥사고날 아키텍처 다이어그램 도출
+
+![image](https://user-images.githubusercontent.com/74900977/118950508-37a8b100-b995-11eb-9ea8-accdc7589886.png)
      
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
