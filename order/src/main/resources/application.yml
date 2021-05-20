@@ -1,7 +1,6 @@
 server:
   port: 8080
 ---
-
 spring:
   profiles: default
   jpa:
@@ -37,8 +36,13 @@ logging:
     org.springframework.cloud: debug
 server:
   port: 8082
----
 
+feign:
+  client:
+    url:
+      customerUrl: http://localhost:8081
+      productUrl: http://localhost:8083
+---
 spring:
   profiles: docker
   cloud:
@@ -62,3 +66,8 @@ spring:
         event-out:
           destination: coffee
           contentType: application/json
+feign:
+  client:
+    url:
+      customerUrl: http://customer:8080
+      productUrl: http://product:8080
