@@ -18,57 +18,35 @@ mvn spring-boot:run
 
 ## DDD 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다. (예시 : order)
+- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다.
 ```
 package coffee;
 
 import javax.persistence.*;
-
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 import org.springframework.beans.BeanUtils;
 
 @Entity
-@DynamicInsert
-@Table(name = "Order_table")
-public class Order {
+@Table(name = "Delivery_table")
+public class Delivery {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Long customerId;
-    private Long productId;
-    @ColumnDefault("'Ordered'")
+    private Long orderId;
     private String status;
-    private Integer waitingNumber;
-
-    @PrePersist
-    public void onPrePersist() throws Exception {
-        this.waitingNumber = OrderApplication.applicationContext.getBean(coffee.OrderRepository.class)
-                .countByStatus("Waited");
-        System.out.println(this.waitingNumber);
-    }
 
     @PostPersist
-    public void onPostPersist() throws Exception {
+    public void onPostPersist() {
+        OrderWaited orderWaited = new OrderWaited();
+        BeanUtils.copyProperties(this, orderWaited);
+        orderWaited.publishAfterCommit();
+    }
 
-        Integer price = OrderApplication.applicationContext.getBean(coffee.external.ProductService.class)
-                .checkProductStatus(this.getProductId());
-
-        if (price > 0) {
-            boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
-                    .checkAndModifyPoint(this.getCustomerId(), price);
-
-            if (result) {
-
-                Ordered ordered = new Ordered();
-                BeanUtils.copyProperties(this, ordered);
-                ordered.publishAfterCommit();
-
-            } else
-                throw new Exception("Customer Point - Exception Raised");
-        } else
-            throw new Exception("Product Sold Out - Exception Raised");
+    @PostUpdate
+    public void onPostUpdate() {
+        StatusUpdated statusUpdated = new StatusUpdated();
+        BeanUtils.copyProperties(this, statusUpdated);
+        statusUpdated.publishAfterCommit();
     }
 
     public Long getId() {
@@ -79,20 +57,12 @@ public class Order {
         this.id = id;
     }
 
-    public Long getCustomerId() {
-        return customerId;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public String getStatus() {
@@ -102,15 +72,8 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
-
-    public Integer getWaitingNumber() {
-        return waitingNumber;
-    }
-
-    public void setWaitingNumber(Integer waitingNumber) {
-        this.waitingNumber = waitingNumber;
-    }
 }
+
 
 ```
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
