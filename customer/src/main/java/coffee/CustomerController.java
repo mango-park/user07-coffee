@@ -13,8 +13,7 @@ public class CustomerController {
         @Autowired
         CustomerRepository customerRepository;
 
-        @RequestMapping(value = "/customers/checkAndModifyPoint", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-
+        @RequestMapping(value = "/customers/checkAndModifyPoint", method = RequestMethod.GET)
         public boolean checkAndModifyPoint(@RequestParam("customerId") Long customerId,
                         @RequestParam("price") Integer price) throws Exception {
                 System.out.println("##### /customer/checkAndModifyPoint  called #####");
