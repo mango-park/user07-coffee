@@ -4,5 +4,5 @@ metadata:
   name: report
   namespace: coffee
 data:
-  TEXT1: DT_Company
+  TEXT1: my-kafka.kafka.svc.cluster.local:9092
   TEXT2: Welcome
