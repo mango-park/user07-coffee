@@ -1,45 +1,53 @@
 package coffee;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.beans.BeanUtils;
-import java.util.List;
-import java.util.Date;
 
 @Entity
-@Table(name="Order_table")
+@DynamicInsert
+@Table(name = "Order_table")
 public class Order {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Long customerId;
     private Long productId;
+    @ColumnDefault("'ordered'")
     private String status;
     private Integer waitingNumber;
 
-    @PostPersist
-    public void onPostPersist() throws Exception{
-
-// Edited Source
-        Integer price = OrderApplication.applicationContext.getBean(coffee.external.ProductService.class)
-        .checkProductStatus(this.getProductId());   
-
-        if ( price > 0 ) {
-            boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
-            .checkAndModifyPoint(this.getCustomerId(), price) ;
-
-                if (result) {
-
-                    Ordered ordered = new Ordered();
-                    BeanUtils.copyProperties(this, ordered);
-                    ordered.publishAfterCommit();
-
-                } else 
-                    throw new Exception("Customer Point - Exception Raised");
-            } else throw new Exception("Product Sold Out - Exception Raised");
-
+    @PrePersist
+    public void onPrePersist() throws Exception {
+        this.waitingNumber = OrderApplication.applicationContext.getBean(coffee.OrderRepository.class)
+                .countByStatus("waited");
+        System.out.println(this.waitingNumber);
     }
 
+    @PostPersist
+    public void onPostPersist() throws Exception {
+
+        Integer price = OrderApplication.applicationContext.getBean(coffee.external.ProductService.class)
+                .checkProductStatus(this.getProductId());
+
+        if (price > 0) {
+            boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
+                    .checkAndModifyPoint(this.getCustomerId(), 100);
+
+            if (result) {
+
+                Ordered ordered = new Ordered();
+                BeanUtils.copyProperties(this, ordered);
+                ordered.publishAfterCommit();
+
+            } else
+                throw new Exception("Customer Point - Exception Raised");
+        } else
+            throw new Exception("Product Sold Out - Exception Raised");
+    }
 
     public Long getId() {
         return id;
@@ -48,6 +56,7 @@ public class Order {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getCustomerId() {
         return customerId;
     }
@@ -55,6 +64,7 @@ public class Order {
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
+
     public Long getProductId() {
         return productId;
     }
@@ -70,6 +80,7 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
+
     public Integer getWaitingNumber() {
         return waitingNumber;
     }
@@ -77,8 +88,4 @@ public class Order {
     public void setWaitingNumber(Integer waitingNumber) {
         this.waitingNumber = waitingNumber;
     }
-
-
-
-
 }
