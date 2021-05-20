@@ -143,4 +143,6 @@ HPA 적용
     horizontalpodautoscaler.autoscaling/gateway autoscaled
 
 
-kubectl -n kube-system describe secret $(kubectl -n kube-systemn get secret | grep eks-admin | awk '{print $1}')
+ConfigMap
+
+    kubectl apply -f /Users/joonhopark/workspace/study/coffee/report/kubernetes/report-configmap.yml

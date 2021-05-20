@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: report
+  namespace: coffee
+data:
+  TEXT1: DT_Company
+  TEXT2: Welcome

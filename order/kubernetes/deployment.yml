@@ -36,3 +36,7 @@ spec:
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 5
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
