@@ -66,3 +66,65 @@ k8s에 kafka 설치 및 실행
     NAME: my-kafka
     .. 이하 생략
 
+ECR 생성
+    customer/delivery/gateway/order/product 개별 수행
+
+    ➜  ~ aws ecr create-repository --repository-name customer --region ap-northeast-2
+    {
+    "repository": {
+    "repositoryArn": "arn:aws:ecr:ap-northeast-2:740569282574:repository/customer",
+    "registryId": "740569282574",
+    "repositoryName": "customer",
+    "repositoryUri": "740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer",
+    "createdAt": 1621481757.0,
+    "imageTagMutability": "MUTABLE",
+    "imageScanningConfiguration": {
+    "scanOnPush": false
+    },
+    "encryptionConfiguration": {
+    "encryptionType": "AES256"
+    }
+    }
+    }
+
+Docker 이미지 생성 및 ECR push
+    customer/delivery/gateway/order/product 개별 수행
+
+    이미지 생성
+    ➜  customer (main) ✗ docker build -t 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer:v1 .
+    
+    이미지 확인(1회)
+    ➜  customer (main) ✗ docker images
+    REPOSITORY                                                   TAG       IMAGE ID       CREATED         SIZE
+    740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer   v1        22ac70a0386d   2 minutes ago   164MB
+
+    ECR 인증(1회)
+    ➜  customer (main) ✗ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/
+    Login Succeeded
+
+    ECR push
+    ➜  customer (main) ✗ docker push 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer:v1
+    The push refers to repository [740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer]
+    d3ffee86f8ff: Pushed
+    ceaf9e1ebef5: Pushed
+    9b9b7f3d56a0: Pushed
+    f1b5933fe4b5: Pushed
+    v1: digest: sha256:e01dac57504bc29da660fba46e1db01e19582ddd53fe5b384c3570e95391a609 size: 1159
+
+[k8s] 
+
+namespace 생성
+
+    ➜  ~ kubectl create ns coffee
+    namespace/coffee created
+
+Service 생성
+
+    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/coffee/product/kubernetes/service.yaml
+    service/product created
+
+Deployment 생성
+
+    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/coffee/product/kubernetes/deployment.yml
+    deployment.apps/product created
+    주의점: ECR image 경로가 맞아야함
