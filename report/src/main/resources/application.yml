@@ -45,7 +45,7 @@ spring:
     stream:
       kafka:
         binder:
-          brokers: {TEXT1}
+          brokers: ${TEXT1}
         streams:
           binder:
             configuration:

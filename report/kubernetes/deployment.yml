@@ -17,9 +17,12 @@ spec:
     spec:
       containers:
         - name: report
-          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/report:v1
+          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/report:v5
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: report-config
           readinessProbe:
             httpGet:
               path: '/actuator/health'
