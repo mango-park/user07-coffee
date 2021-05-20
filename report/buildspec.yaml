@@ -37,13 +37,15 @@ phases:
       - echo connect kubectl
       - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
       - kubectl config set-credentials admin --token="$KUBE_TOKEN"
-      - kubectl config use-context coffee
+      - kubectl config set-context default --cluster=k8s --user=admin
+      - kubectl config use-context default
       - |
         cat <<EOF | kubectl apply -f -
         apiVersion: v1
         kind: Service
         metadata:
           name: $_PROJECT_NAME
+          namespace: coffee
           labels:
             app: $_PROJECT_NAME
         spec:
@@ -59,6 +61,7 @@ phases:
         kind: Deployment
         metadata:
           name: $_PROJECT_NAME
+          namespace: coffee
           labels:
             app: $_PROJECT_NAME
         spec:
