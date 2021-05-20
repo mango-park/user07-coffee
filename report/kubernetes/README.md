@@ -128,3 +128,9 @@ Deployment 생성
     ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/coffee/product/kubernetes/deployment.yml
     deployment.apps/product created
     주의점: ECR image 경로가 맞아야함
+
+
+➜  ~ kubectl create deploy gateway -n coffee --image=740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/gateway:v1
+deployment.apps/gateway created
+➜  ~ kubectl expose deploy gateway -n coffee --type="LoadBalancer" --port=8080
+service/gateway exposed
