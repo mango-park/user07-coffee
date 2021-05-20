@@ -1,15 +1,15 @@
+# 1조 프로젝트 : SirenOrder
+
 ![image](https://user-images.githubusercontent.com/74900977/118920002-81cb6b80-b970-11eb-8ca7-a5e62d96a77e.png)
 
-# 예제 - 음식배달
+1조 프로젝트는 SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설계/구현/운영 전단계를 커버하도록 구성한 프로젝트임
 
-본 예제는 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설계/구현/운영 전단계를 커버하도록 구성한 예제입니다.
-이는 클라우드 네이티브 애플리케이션의 개발에 요구되는 체크포인트들을 통과하기 위한 예시 답안을 포함합니다.
-- 체크포인트 : https://workflowy.com/s/assessment-check-po/T5YrzcMewfo4J6LW
+- 체크포인트 : https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 
 
 # Table of contents
 
-- [예제 - 음식배달](#---)
+- [예제 - SirenOrder](#---)
   - [서비스 시나리오](#서비스-시나리오)
   - [체크포인트](#체크포인트)
   - [분석/설계](#분석설계)
@@ -28,9 +28,7 @@
 
 # 서비스 시나리오
 
-배달의 민족 커버하기 - https://1sung.tistory.com/106
-
-기능적 요구사항
+[ 기능적 요구사항 ]
 1. 고객이 메뉴를 선택하여 주문한다
 1. 고객이 결제한다
 1. 주문이 되면 주문 내역이 입점상점주인에게 전달된다
@@ -40,7 +38,7 @@
 1. 고객이 주문상태를 중간중간 조회한다
 1. 주문상태가 바뀔 때 마다 카톡으로 알림을 보낸다
 
-비기능적 요구사항
+[ 비기능적 요구사항 ]
 1. 트랜잭션
     1. 결제가 되지 않은 주문건은 아예 거래가 성립되지 않아야 한다  Sync 호출 
 1. 장애격리
