@@ -130,7 +130,17 @@ Deployment 생성
     주의점: ECR image 경로가 맞아야함
 
 
-➜  ~ kubectl create deploy gateway -n coffee --image=740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/gateway:v1
-deployment.apps/gateway created
-➜  ~ kubectl expose deploy gateway -n coffee --type="LoadBalancer" --port=8080
-service/gateway exposed
+Gateway 작업
+
+    ➜  ~ kubectl create deploy gateway -n coffee --image=740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/gateway:v1
+    deployment.apps/gateway created
+    ➜  ~ kubectl expose deploy gateway -n coffee --type="LoadBalancer" --port=8080
+    service/gateway exposed
+
+HPA 적용
+
+    ➜  ~ kubectl autoscale deployment gateway -n coffee --cpu-percent=25 --min=2 --max=4
+    horizontalpodautoscaler.autoscaling/gateway autoscaled
+
+
+kubectl -n kube-system describe secret $(kubectl -n kube-systemn get secret | grep eks-admin | awk '{print $1}')
