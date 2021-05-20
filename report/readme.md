@@ -205,13 +205,15 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
 ```
 # 주문 처리
 http POST http://localhost:8082/orders customerId=100 productId=100
+http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders customerId=100 productId=100
 
 # 배달 완료 처리
 http PATCH http://localhost:8084/deliveries/1 status=Completed
+http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/deliveries/1 status=Completed
 
 # 주문 상태 확인
 http GET http://localhost:8082/orders/1
-
+http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders/1
 ```
 
 
@@ -278,7 +280,7 @@ public interface CustomerService {
 
 
 ```
-# 고객 (customer) 서비스를 잠시 내려놓음 (ctrl+c)
+# 고객 (customer) 서비스를 잠시 내려놓음 (ctrl+c, replicas 0 으로 설정)
 
 #주문처리 
 http POST http://localhost:8082/orders customerId=100 productId=100   #Fail
@@ -290,6 +292,10 @@ mvn spring-boot:run
 
 #주문처리
 http POST http://localhost:8082/orders customerId=100 productId=100   #Success
+
+
+http POST http://localhost:8082/orders customerId=100 productId=100
+
 http POST http://localhost:8082/orders customerId=101 productId=101   #Success
 ```
 
@@ -356,7 +362,6 @@ public class PolicyHandler{
 
 #주문처리
 http POST http://localhost:8082/orders customerId=100 productId=100   #Success
-http POST http://localhost:8082/orders customerId=101 productId=101   #Success
 
 #주문상태 확인
 http POST http://localhost:8082/orders     # 주문상태 Ordered 확인
@@ -370,14 +375,45 @@ http localhost:8082/orders     # 주문 상태 Waited로 변경 확인
 ```
 
 
-# 운영 ( 업데이트 필요 )
+# 운영
 
 ## CI/CD 설정
+SirenOrder의 ERC 구성은 아래와 같다.
+![image](https://user-images.githubusercontent.com/20352446/118971683-ad6b4780-b9aa-11eb-893a-1cd05a95ea11.png)
+
+사용한 CI/CD 도구는 AWS CodeBuild
+![image](https://user-images.githubusercontent.com/20352446/118972243-4d28d580-b9ab-11eb-83aa-5cd39d06a784.png)
+GitHub Webhook이 동작하여 Docker image가 자동 생성 및 ECR 업로드 된다.
+(pipeline build script 는 report 폴더 이하에 buildspec.yaml 에 포함)
+![image](https://user-images.githubusercontent.com/20352446/118972320-6467c300-b9ab-11eb-811a-423bcb9b59e2.png)
+참고로 그룹미션 작업의 편의를 위해 하나의 git repository를 사용하였다
 
 
-각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 GCP를 사용하였으며, pipeline build script 는 각 프로젝트 폴더 이하에 cloudbuild.yml 에 포함되었다.
+## Kubernetes 설정
+AWS EKS를 활용했으며, 추가한 namespace는 coffee와 kafka로 아래와 같다.
+
+###EKS Deployment
+
+namespace: coffee
+![image](https://user-images.githubusercontent.com/20352446/118971846-d986c880-b9aa-11eb-8872-5baf9083d99a.png)
+
+namespace: kafka
+![image](https://user-images.githubusercontent.com/20352446/118973352-8dd51e80-b9ac-11eb-8d5f-ac6aa9fe9e5a.png)
+
+###EKS Service
+gateway가 아래와 같이 LoadBalnacer 역할을 수행한다  
+
+    ➜  ~ kubectl get service -o wide -n coffee
+    NAME       TYPE           CLUSTER-IP       EXTERNAL-IP                                                                    PORT(S)          AGE     SELECTOR
+    customer   ClusterIP      10.100.166.116   <none>                                                                         8080/TCP         8h      app=customer
+    delivery   ClusterIP      10.100.138.255   <none>                                                                         8080/TCP         8h      app=delivery
+    gateway    LoadBalancer   10.100.59.190    ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com   8080:31716/TCP   6h11m   app=gateway
+    order      ClusterIP      10.100.123.133   <none>                                                                         8080/TCP         8h      app=order
+    product    ClusterIP      10.100.170.95    <none>                                                                         8080/TCP         5h44m   app=product
+    report     ClusterIP      10.100.127.177   <none>                                                                         8080/TCP         4h41m   app=report
 
 
+#( 업데이트 필요 )
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
@@ -421,134 +457,20 @@ hystrix:
 - 60초 동안 실시
 
 ```
-$ siege -c100 -t60S -r10 --content-type "application/json" 'http://localhost:8081/orders POST {"item": "chicken"}'
+siege -c100 -t60S -r10 --content-type "application/json" 'http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders POST {"customerId":101, "productId":101}'
 
-** SIEGE 4.0.5
-** Preparing 100 concurrent users for battle.
-The server is now under siege...
-
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.73 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.75 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.77 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.97 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.81 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.87 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.12 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.16 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.17 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.26 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.25 secs:     207 bytes ==> POST http://localhost:8081/orders
-
-* 요청이 과도하여 CB를 동작함 요청을 차단
-
-HTTP/1.1 500     1.29 secs:     248 bytes ==> POST http://localhost:8081/orders   
-HTTP/1.1 500     1.24 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     1.23 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     1.42 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     2.08 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.29 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     1.24 secs:     248 bytes ==> POST http://localhost:8081/orders
-
-* 요청을 어느정도 돌려보내고나니, 기존에 밀린 일들이 처리되었고, 회로를 닫아 요청을 다시 받기 시작
-
-HTTP/1.1 201     1.46 secs:     207 bytes ==> POST http://localhost:8081/orders  
-HTTP/1.1 201     1.33 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.36 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.63 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.65 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.69 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.71 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.71 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.74 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.76 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     1.79 secs:     207 bytes ==> POST http://localhost:8081/orders
-
-* 다시 요청이 쌓이기 시작하여 건당 처리시간이 610 밀리를 살짝 넘기기 시작 => 회로 열기 => 요청 실패처리
-
-HTTP/1.1 500     1.93 secs:     248 bytes ==> POST http://localhost:8081/orders    
-HTTP/1.1 500     1.92 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     1.93 secs:     248 bytes ==> POST http://localhost:8081/orders
-
-* 생각보다 빨리 상태 호전됨 - (건당 (쓰레드당) 처리시간이 610 밀리 미만으로 회복) => 요청 수락
-
-HTTP/1.1 201     2.24 secs:     207 bytes ==> POST http://localhost:8081/orders  
-HTTP/1.1 201     2.32 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.16 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.19 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.19 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.19 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.21 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.29 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.30 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.38 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.59 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.61 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.62 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     2.64 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.01 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.27 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.33 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.45 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.52 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.57 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.69 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.69 secs:     207 bytes ==> POST http://localhost:8081/orders
-
-* 이후 이러한 패턴이 계속 반복되면서 시스템은 도미노 현상이나 자원 소모의 폭주 없이 잘 운영됨
-
-
-HTTP/1.1 500     4.76 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.23 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.76 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.74 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.82 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.82 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.84 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.66 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     5.03 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.22 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.19 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.18 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.69 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.65 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     5.13 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.84 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.25 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.25 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.80 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.87 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.33 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.86 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.96 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.34 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 500     4.04 secs:     248 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.50 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.95 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.54 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     4.65 secs:     207 bytes ==> POST http://localhost:8081/orders
-
-
-:
-:
-
-Transactions:		        1025 hits
-Availability:		       63.55 %
-Elapsed time:		       59.78 secs
-Data transferred:	        0.34 MB
-Response time:		        5.60 secs
-Transaction rate:	       17.15 trans/sec
-Throughput:		        0.01 MB/sec
-Concurrency:		       96.02
-Successful transactions:        1025
-Failed transactions:	         588
-Longest transaction:	        9.20
-Shortest transaction:	        0.00
+Transactions:		          22 hits
+Availability:		        1.92 %
+Elapsed time:		        9.99 secs
+Data transferred:	        0.27 MB
+Response time:		       44.28 secs
+Transaction rate:	        2.20 trans/sec
+Throughput:		        0.03 MB/sec
+Concurrency:		       97.51
+Successful transactions:          22
+Failed transactions:	        1123
+Longest transaction:	        4.53
+Shortest transaction:	        0.02
 
 ```
 - 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌. 하지만, 63.55% 가 성공하였고, 46%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 Retry 설정과 동적 Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
@@ -556,102 +478,119 @@ Shortest transaction:	        0.00
 - Retry 의 설정 (istio)
 - Availability 가 높아진 것을 확인 (siege)
 
-### 오토스케일 아웃
-앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다. 
 
+### Autoscale (HPA)
 
-- 결제서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
+- 주문서비스에 대해 HPA를 설정한다. 설정은 CPU 사용량이 5%를 넘어서면 pod를 10개까지 추가한다.
 ```
-kubectl autoscale deploy pay --min=1 --max=10 --cpu-percent=15
+➜  ~ kubectl autoscale deploy order -n coffee --min=1 --max=10 --cpu-percent=10
+
+➜  ~ kubectl get hpa -n coffee
+NAME      REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+gateway   Deployment/gateway   <unknown>/25%   2         4         2          5h44m
+order     Deployment/order     <unknown>/5%    1         10        1          125m
 ```
-- CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
+- 부하를 2분간 유지한다.
 ```
-siege -c100 -t120S -r10 --content-type "application/json" 'http://localhost:8081/orders POST {"item": "chicken"}'
+siege -c100 -t120S -r10 --content-type "application/json" 'http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders POST {"customerId":101, "productId":101}'
 ```
-- 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
+- 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다.
 ```
-kubectl get deploy pay -w
+➜  ~ kubectl get deploy -n coffee
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+customer   1/1     1            1           8h
+delivery   1/1     1            1           8h
+gateway    2/2     2            2           6h24m
+order      2/2     2            2           8h
+product    1/1     1            1           8h
+report     1/1     1            1           4h51m
 ```
-- 어느정도 시간이 흐른 후 (약 30초) 스케일 아웃이 벌어지는 것을 확인할 수 있다:
-```
-NAME    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-pay     1         1         1            1           17s
-pay     1         2         1            1           45s
-pay     1         4         1            1           1m
-:
-```
-- siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다. 
-```
-Transactions:		        5078 hits
-Availability:		       92.45 %
-Elapsed time:		       120 secs
-Data transferred:	        0.34 MB
-Response time:		        5.60 secs
-Transaction rate:	       17.15 trans/sec
-Throughput:		        0.01 MB/sec
-Concurrency:		       96.02
+- 어느정도 시간이 흐르면 스케일 아웃이 벌어지는 것을 확인할 수 있다.
 ```
 
 
-## 무정지 재배포
-
-* 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
-
-- seige 로 배포작업 직전에 워크로드를 모니터링 함.
-```
-siege -c100 -t120S -r10 --content-type "application/json" 'http://localhost:8081/orders POST {"item": "chicken"}'
-
-** SIEGE 4.0.5
-** Preparing 100 concurrent users for battle.
-The server is now under siege...
-
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.68 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-HTTP/1.1 201     0.70 secs:     207 bytes ==> POST http://localhost:8081/orders
-:
 
 ```
 
-- 새버전으로의 배포 시작
-```
-kubectl set image ...
-```
 
-- seige 의 화면으로 넘어가서 Availability 가 100% 미만으로 떨어졌는지 확인
-```
-Transactions:		        3078 hits
-Availability:		       70.45 %
-Elapsed time:		       120 secs
-Data transferred:	        0.34 MB
-Response time:		        5.60 secs
-Transaction rate:	       17.15 trans/sec
-Throughput:		        0.01 MB/sec
-Concurrency:		       96.02
+## Zero-downtime deploy
+k8s의 무중단 서비스 배포 기능을 점검한다.
 
-```
-배포기간중 Availability 가 평소 100%에서 70% 대로 떨어지는 것을 확인. 원인은 쿠버네티스가 성급하게 새로 올려진 서비스를 READY 상태로 인식하여 서비스 유입을 진행한 것이기 때문. 이를 막기위해 Readiness Probe 를 설정함:
+    ➜  ~ kubectl describe deploy order -n coffee
+    Name:                   order
+    Namespace:              coffee
+    CreationTimestamp:      Thu, 20 May 2021 12:59:14 +0900
+    Labels:                 app=order
+    Annotations:            deployment.kubernetes.io/revision: 8
+    Selector:               app=order
+    Replicas:               4 desired | 4 updated | 4 total | 4 available | 0 unavailable
+    StrategyType:           RollingUpdate
+    MinReadySeconds:        0
+    RollingUpdateStrategy:  50% max unavailable, 50% max surge
+    Pod Template:
+        Labels:       app=order
+        Annotations:  kubectl.kubernetes.io/restartedAt: 2021-05-20T12:06:29Z
+        Containers:
+            order:
+                Image:        740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/order:v1
+                Port:         8080/TCP
+                Host Port:    0/TCP
+                Liveness:     http-get http://:8080/actuator/health delay=120s timeout=2s period=5s #success=1 #failure=5
+                Readiness:    http-get http://:8080/actuator/health delay=10s timeout=2s period=5s #success=1 #failure=10
 
-```
-# deployment.yaml 의 readiness probe 의 설정:
+기능 점검을 위해 order Deployment의 replicas를 4로 수정했다. 
+그리고 위 Readiness와 RollingUpdateStrategy 설정이 정상 적용되는지 확인한다.
 
+    ➜  ~ kubectl rollout status deploy/order -n coffee
 
-kubectl apply -f kubernetes/deployment.yaml
-```
+    ➜  ~ kubectl get po -n coffee
+    NAME                        READY   STATUS    RESTARTS   AGE
+    customer-785f544f95-mh456   1/1     Running   0          5h40m
+    delivery-557f4d7f49-z47bx   1/1     Running   0          5h40m
+    gateway-6886bbf85b-58ms8    1/1     Running   0          4h56m
+    gateway-6886bbf85b-mg9fz    1/1     Running   0          4h56m
+    order-7978b484d8-6qsjq      1/1     Running   0          62s
+    order-7978b484d8-h4hjs      1/1     Running   0          62s
+    order-7978b484d8-rw2zk      1/1     Running   0          62s
+    order-7978b484d8-x622v      1/1     Running   0          62s
+    product-7f67966577-n7kqk    1/1     Running   0          5h40m
+    report-5c6fd7b477-w9htj     1/1     Running   0          4h27m
+    
+    ➜  ~ kubectl get deploy -n coffee
+    NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+    customer   1/1     1            1           8h
+    delivery   1/1     1            1           8h
+    gateway    2/2     2            2           6h1m
+    order      2/4     4            2           8h
+    product    1/1     1            1           8h
+    report     1/1     1            1           4h28m
+    
+    ➜  ~ kubectl get po -n coffee
+    NAME                        READY   STATUS    RESTARTS   AGE
+    customer-785f544f95-mh456   1/1     Running   0          5h41m
+    delivery-557f4d7f49-z47bx   1/1     Running   0          5h41m
+    gateway-6886bbf85b-58ms8    1/1     Running   0          4h57m
+    gateway-6886bbf85b-mg9fz    1/1     Running   0          4h57m
+    order-7978b484d8-6qsjq      1/1     Running   0          115s
+    order-7978b484d8-rw2zk      1/1     Running   0          115s
+    order-84c9d7c848-mmw4b      0/1     Running   0          18s
+    order-84c9d7c848-r64lc      0/1     Running   0          18s
+    order-84c9d7c848-tbl8l      0/1     Running   0          18s
+    order-84c9d7c848-tslfc      0/1     Running   0          18s
+    product-7f67966577-n7kqk    1/1     Running   0          5h41m
+    report-5c6fd7b477-w9htj     1/1     Running   0          4h28m
+    
+    ➜  ~ kubectl get po -n coffee
+    NAME                        READY   STATUS    RESTARTS   AGE
+    customer-785f544f95-mh456   1/1     Running   0          5h42m
+    delivery-557f4d7f49-z47bx   1/1     Running   0          5h42m
+    gateway-6886bbf85b-58ms8    1/1     Running   0          4h58m
+    gateway-6886bbf85b-mg9fz    1/1     Running   0          4h58m
+    order-84c9d7c848-mmw4b      1/1     Running   0          65s
+    order-84c9d7c848-r64lc      1/1     Running   0          65s
+    order-84c9d7c848-tbl8l      1/1     Running   0          65s
+    order-84c9d7c848-tslfc      1/1     Running   0          65s
+    product-7f67966577-n7kqk    1/1     Running   0          5h42m
+    report-5c6fd7b477-w9htj     1/1     Running   0          4h29m
 
-- 동일한 시나리오로 재배포 한 후 Availability 확인:
-```
-Transactions:		        3078 hits
-Availability:		       100 %
-Elapsed time:		       120 secs
-Data transferred:	        0.34 MB
-Response time:		        5.60 secs
-Transaction rate:	       17.15 trans/sec
-Throughput:		        0.01 MB/sec
-Concurrency:		       96.02
-
-```
-
-배포기간 동안 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
-
-
+배포시 pod는 위의 흐름과 같이 생성 및 종료되어 서비스의 무중단을 보장했다.
