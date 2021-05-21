@@ -12,10 +12,17 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 - [예제 - SirenOrder](#---)
   - [서비스 시나리오](#서비스-시나리오)
   - [분석/설계](#분석설계)
+    - [Event Storming 결과](#Event Storming 결과)
+    - [이벤트 도출](#이벤트 도출)    
+    - [바운디드 컨텍스트](#바운디드 컨텍스트)
+    - [완성된 1차 모형](#완성된 1차 모형)
+    - [기능 요구사항에 대한 검증](#기능적 요구사항을 커버하는지 검증)
+    - [비기능 요구사항에 대한 검증](#비기능 요구사항에 대한 검증)
+    - [헥사고날 아키텍처 다이어그램 도출](#헥사고날 아키텍처 다이어그램 도출)
   - [구현:](#구현-)
     - [DDD 의 적용](#ddd-의-적용)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
-    - [비동기식 호출 과 Eventual Consistency](#비동기식 호출 (publish-subscribe))
+    - [비동기식 호출 과 Eventual Consistency](#비동기식 호출 publish-subscribe)
   - [운영](#운영)
     - [CI/CD 설정](#cicd설정)
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
@@ -76,7 +83,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 ![image](https://user-images.githubusercontent.com/74900977/118931820-581b4000-b982-11eb-963a-a47b5f014844.png)
 
 
-### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
+### 기능적 요구사항을 커버하는지 검증
 
 ![image](https://user-images.githubusercontent.com/74900977/118940019-425e4880-b98b-11eb-85ce-16375ba40f1e.png)
 
