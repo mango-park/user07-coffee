@@ -11,7 +11,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 
 - [예제 - SirenOrder](#---)
   - [서비스 시나리오](#서비스-시나리오)
-  - [분석/설계](#분석설계)
+  - [분석/설계](#분석설계-)
     - [Event Storming 결과](#Event Storming 결과)
     - [이벤트 도출](#이벤트 도출)    
     - [바운디드 컨텍스트](#바운디드 컨텍스트)
@@ -25,7 +25,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
     - [비동기식 호출 과 Eventual Consistency](#비동기식 호출 publish-subscribe)
 
-  - [운영](#운영)
+  - [운영](#운영-)
     - [CI/CD 설정](# CI/CD 설정)
     - [Kubernetes 설정](# Kubernetes 설정)
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](# 동기식 호출 / 서킷 브레이킹 / 장애격리)
