@@ -397,7 +397,6 @@ gateway가 아래와 같이 LoadBalnacer 역할을 수행한다
     report     ClusterIP      10.100.127.177   <none>                                                                         8080/TCP         4h41m   app=report
 
 
-#( 업데이트 필요 )
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
@@ -482,27 +481,39 @@ Shortest transaction:	        0.01
 
 ### Autoscale (HPA)
 
-- 주문서비스에 대해 HPA를 설정한다. 설정은 CPU 사용량이 5%를 넘어서면 pod를 10개까지 추가한다.
+- 주문서비스에 대해 HPA를 설정한다. 설정은 CPU 사용량이 5%를 넘어서면 pod를 5개까지 추가한다.(memory 자원 이슈로 10개 불가)
 ```
-➜  ~ kubectl autoscale deploy order -n coffee --min=1 --max=10 --cpu-percent=10
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: product
+  namespace: coffee
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: product
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 5
 
 ➜  ~ kubectl get hpa -n coffee
 NAME      REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
-gateway   Deployment/gateway   <unknown>/25%   2         4         2          5h44m
-order     Deployment/order     <unknown>/5%    1         10        1          125m
+order     Deployment/order     30%/5%          1         5         5          17h
+product   Deployment/product   31%/10%         1         5         5          132m
 ```
 - 부하를 2분간 유지한다.
 ```
-siege -c100 -t120S -r10 --content-type "application/json" 'http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders POST {"customerId":101, "productId":101}'
+➜  ~ siege -c30 -t60S -r10 --content-type "application/json" 'http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders POST {"customerId":2, "productId":1}'
 ```
-- 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다.
+- 오토스케일이 어떻게 되고 있는지 확인한다.
 ```
 ➜  ~ kubectl get deploy -n coffee
 NAME       READY   UP-TO-DATE   AVAILABLE   AGE
 customer   1/1     1            1           8h
 delivery   1/1     1            1           8h
 gateway    2/2     2            2           6h24m
-order      2/2     2            2           8h
+order      1/1     1            1           8h
 product    1/1     1            1           8h
 report     1/1     1            1           4h51m
 ```
@@ -510,12 +521,12 @@ report     1/1     1            1           4h51m
 ```
 ➜  ~ kubectl get deploy -n coffee
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-customer          1/1     1            1           22h
-delivery          1/1     1            1           22h
-gateway           2/2     2            2           20h
-order             1/1     1            1           22h
-product           1/5     5            1           22h
-report            1/1     1            1           18h
+customer          1/1     1            1           23h
+delivery          1/1     1            1           23h
+gateway           2/2     2            2           21h
+order             5/5     5            5           23h
+product           5/5     5            5           23h
+report            1/1     1            1           19h
 ```
 
 - Availability 가 높아진 것을 확인 (siege)
