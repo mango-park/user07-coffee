@@ -216,22 +216,6 @@ http GET http://localhost:8082/orders/1
 http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders/1
 ```
 
-
-## 폴리글랏 퍼시스턴스
-
-//TODO 폴리그랏 작업 후 추가 영역
-```
-//소스
-```
-
-## 폴리글랏 프로그래밍
-
-//TODO 폴리그랏 작업 후 추가 영역
-```
-//소스
-```
-
-
 ## 동기식 호출 과 Fallback 처리
 
 분석단계에서의 조건 중 하나로 주문(order)->고객(customer) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
