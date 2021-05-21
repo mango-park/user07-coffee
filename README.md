@@ -28,7 +28,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - [CI/CD 설정](#CICD-설정)
     - [Kubernetes 설정](#Kubernetes-설정)
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출/서킷-브레이킹/장애격리)
-    - [오토스케일 아웃](#Autoscale-(HPA))
+    - [오토스케일 아웃](#Autoscale HPA)
     - [무정지 재배포](#Zero-downtime-deploy)
  
  
@@ -503,7 +503,7 @@ Shortest transaction:	        0.01
 
 
 
-### Autoscale (HPA)
+### Autoscale HPA
 
 - 주문서비스에 대해 HPA를 설정한다. 설정은 CPU 사용량이 5%를 넘어서면 pod를 5개까지 추가한다.(memory 자원 이슈로 10개 불가)
 ```
