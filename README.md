@@ -19,16 +19,18 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - [기능 요구사항에 대한 검증](#기능적 요구사항을 커버하는지 검증)
     - [비기능 요구사항에 대한 검증](#비기능 요구사항에 대한 검증)
     - [헥사고날 아키텍처 다이어그램 도출](#헥사고날 아키텍처 다이어그램 도출)
+    
   - [구현:](#구현-)
     - [DDD 의 적용](#ddd-의-적용)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
     - [비동기식 호출 과 Eventual Consistency](#비동기식 호출 publish-subscribe)
-    - [비동기식 호출 과 Eventual Consistency](## 비동기식 호출 publish-subscribe)
+
   - [운영](#운영)
-    - [CI/CD 설정](#cicd설정)
-    - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
-    - [오토스케일 아웃](#오토스케일-아웃)
-    - [무정지 재배포](#무정지-재배포)
+    - [CI/CD 설정](# CI/CD 설정)
+    - [Kubernetes 설정](# Kubernetes 설정)
+    - [동기식 호출 / 서킷 브레이킹 / 장애격리](# 동기식 호출 / 서킷 브레이킹 / 장애격리)
+    - [오토스케일 아웃](#Autoscale (HPA))
+    - [무정지 재배포](#Zero-downtime deploy)
  
 
 # 서비스 시나리오
