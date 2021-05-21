@@ -25,7 +25,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - [비동기식 호출 과 Eventual Consistency](#동기식-호출-과-Fallback-처리)
     
   - [운영](#운영)
-    - [CI/CD 설정](#CI/CD-설정)
+    - [CI/CD 설정](##CICD 설정)
     - [Kubernetes 설정](#Kubernetes-설정)
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출/서킷-브레이킹/장애격리)
     - [오토스케일 아웃](#Autoscale-(HPA))
@@ -385,7 +385,7 @@ http GET localhost:8082/orders/1     # 주문 상태 Waited로 변경 확인
 
 # 운영
 
-## CI/CD 설정
+## CICD 설정
 SirenOrder의 ECR 구성은 아래와 같다.
 ![image](https://user-images.githubusercontent.com/20352446/118971683-ad6b4780-b9aa-11eb-893a-1cd05a95ea11.png)
 
