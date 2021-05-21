@@ -402,7 +402,7 @@ gateway가 아래와 같이 LoadBalnacer 역할을 수행한다
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 단말앱(app)-->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 주문(order)-->상품(product) 연결을 RestFul Request/Response 로 연동하여 구현이 되어있고, 주문이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -418,22 +418,22 @@ hystrix:
       execution.isolation.thread.timeoutInMilliseconds: 610
 
 ```
-
-- 피호출 서비스(결제:pay) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
+- 상품(product) 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
 ```
-# (pay) 결제이력.java (Entity)
+        @RequestMapping(value = "/products/checkProductStatus", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+        public Integer checkProductStatus(@RequestParam("productId") Long productId) throws Exception {
+                
+                //FIXME 생략
+                
+                //임의의 부하를 위한 강제 설정
+                try {
+                        Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+                } catch (InterruptedException e) {
+                        e.printStackTrace();
+                }
 
-    @PrePersist
-    public void onPrePersist(){  //결제이력을 저장한 후 적당한 시간 끌기
-
-        ...
-        
-        try {
-            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+                return price;
         }
-    }
 ```
 
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
@@ -441,26 +441,43 @@ hystrix:
 - 60초 동안 실시
 
 ```
-siege -c100 -t60S -r10 --content-type "application/json" 'http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders POST {"customerId":101, "productId":101}'
+siege -c100 -t60S -r10 --content-type "application/json" 'http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders POST {"customerId":2, "productId":3}'
 
-Transactions:		          22 hits
-Availability:		        1.92 %
-Elapsed time:		        9.99 secs
-Data transferred:	        0.27 MB
-Response time:		       44.28 secs
-Transaction rate:	        2.20 trans/sec
-Throughput:		        0.03 MB/sec
-Concurrency:		       97.51
-Successful transactions:          22
+HTTP/1.1 201     6.51 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     0.73 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.03 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.22 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.25 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.20 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.24 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.31 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.29 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.42 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.23 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.30 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201    11.88 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     0.66 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.29 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.41 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+HTTP/1.1 201     6.33 secs:     239 bytes ==> POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders
+
+Transactions:		         659 hits
+Availability:		       36.98 %
+Elapsed time:		       58.42 secs
+Data transferred:	        0.98 MB
+Response time:		        8.59 secs
+Transaction rate:	       11.28 trans/sec
+Throughput:		        0.02 MB/sec
+Concurrency:		       96.94
+Successful transactions:         659
 Failed transactions:	        1123
-Longest transaction:	        4.53
-Shortest transaction:	        0.02
+Longest transaction:	       27.38
+Shortest transaction:	        0.01
 
 ```
-- 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌. 하지만, 63.55% 가 성공하였고, 46%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 Retry 설정과 동적 Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
+- 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호. 
+  시스템의 안정적인 운영을 위해 HPA 적용 필요.
 
-- Retry 의 설정 (istio)
-- Availability 가 높아진 것을 확인 (siege)
 
 
 ### Autoscale (HPA)
@@ -489,11 +506,32 @@ order      2/2     2            2           8h
 product    1/1     1            1           8h
 report     1/1     1            1           4h51m
 ```
-- 어느정도 시간이 흐르면 스케일 아웃이 벌어지는 것을 확인할 수 있다.
+- 어느정도 시간이 흐르면 스케일 아웃이 동작하는 것을 확인
+```
+➜  ~ kubectl get deploy -n coffee
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+customer          1/1     1            1           22h
+delivery          1/1     1            1           22h
+gateway           2/2     2            2           20h
+order             1/1     1            1           22h
+product           1/5     5            1           22h
+report            1/1     1            1           18h
 ```
 
-
-
+- Availability 가 높아진 것을 확인 (siege)
+```
+Transactions:		         995 hits
+Availability:		       82.64 %
+Elapsed time:		       59.85 secs
+Data transferred:	        0.29 MB
+Response time:		        5.11 secs
+Transaction rate:	       16.62 trans/sec
+Throughput:		        0.00 MB/sec
+Concurrency:		       84.94
+Successful transactions:         995
+Failed transactions:	         209
+Longest transaction:	       15.26
+Shortest transaction:	        0.02
 ```
 
 
