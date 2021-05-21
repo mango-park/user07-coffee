@@ -14,6 +14,9 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
   - [분석/설계](#분석설계)
     - [Event Storming 결과](#Event-Storming-결과)
     - [완성된 1차 모형](#완성된-1차-모형)
+    - [바운디드 컨텍스트](#바운디드-컨텍스트)
+    - [기능적 요구사항 검증](#기능적-요구사항을-커버하는지-검증)
+    - [비기능적 요구사항 검증](#비기능-요구사항에-대한-검증)
     - [헥사고날 아키텍처 다이어그램 도출](#헥사고날-아키텍처-다이어그램-도출)
        
   - [구현:](#구현)
@@ -568,7 +571,6 @@ Shortest transaction:	        0.02
 
 
 ##ConfigMap 설정
-
 특정값을 k8s 설정으로 올리고 서비스를 기동 후, kafka 정상 접근 여부 확인한다.
 
     ➜  ~ kubectl describe cm report-config -n coffee
