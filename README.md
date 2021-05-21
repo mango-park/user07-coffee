@@ -12,12 +12,17 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 - [예제 - SirenOrder](#---)
   - [서비스 시나리오](#서비스-시나리오)
   - [분석/설계](#분석설계)
+    - [Event Storming 결과](#Event Storming 결과)
+    - [이벤트 도출](#이벤트 도출)    
+    - [바운디드 컨텍스트](#바운디드 컨텍스트)
+    - [완성된 1차 모형](#완성된 1차 모형)
+    - [기능 요구사항에 대한 검증](#기능적 요구사항을 커버하는지 검증)
+    - [비기능 요구사항에 대한 검증](#비기능 요구사항에 대한 검증)
+    - [헥사고날 아키텍처 다이어그램 도출](#헥사고날 아키텍처 다이어그램 도출)
   - [구현:](#구현-)
     - [DDD 의 적용](#ddd-의-적용)
-    - [폴리글랏 퍼시스턴스](#폴리글랏-퍼시스턴스)
-    - [폴리글랏 프로그래밍](#폴리글랏-프로그래밍)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
-    - [비동기식 호출 과 Eventual Consistency](#비동기식-호출-과-Eventual-Consistency)
+    - [비동기식 호출 과 Eventual Consistency](#비동기식 호출 publish-subscribe)
   - [운영](#운영)
     - [CI/CD 설정](#cicd설정)
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
@@ -78,7 +83,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 ![image](https://user-images.githubusercontent.com/74900977/118931820-581b4000-b982-11eb-963a-a47b5f014844.png)
 
 
-### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
+### 기능적 요구사항을 커버하는지 검증
 
 ![image](https://user-images.githubusercontent.com/74900977/118940019-425e4880-b98b-11eb-85ce-16375ba40f1e.png)
 
@@ -209,11 +214,11 @@ http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.
 
 # 배달 완료 처리
 http PATCH http://localhost:8084/deliveries/1 status=Completed
-http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/deliveries/1 status=Completed
+http PATCH http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/deliveries/1 status=Completed
 
 # 주문 상태 확인
 http GET http://localhost:8082/orders/1
-http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders/1
+http GET http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders/1
 ```
 
 ## 동기식 호출 과 Fallback 처리
@@ -282,9 +287,6 @@ http POST http://localhost:8082/orders customerId=100 productId=100
 
 http POST http://localhost:8082/orders customerId=101 productId=101   #Success
 ```
-
-- 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
-
 
 
 
@@ -362,7 +364,7 @@ http localhost:8082/orders     # 주문 상태 Waited로 변경 확인
 # 운영
 
 ## CI/CD 설정
-SirenOrder의 ERC 구성은 아래와 같다.
+SirenOrder의 ECR 구성은 아래와 같다.
 ![image](https://user-images.githubusercontent.com/20352446/118971683-ad6b4780-b9aa-11eb-893a-1cd05a95ea11.png)
 
 사용한 CI/CD 도구는 AWS CodeBuild
