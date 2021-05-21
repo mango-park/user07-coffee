@@ -19,7 +19,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - [비동기식 호출 과 Eventual Consistency](#동기식-호출-과-Fallback-처리)
     
   - [운영](#운영)
-    - [CI/CD 설정](## CI/CD 설정)
+    - [CI/CD 설정](#CI/CD 설정)
     - [Kubernetes 설정](#Autoscale)
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#Autoscale)
     - [오토스케일 아웃](#Autoscale)
