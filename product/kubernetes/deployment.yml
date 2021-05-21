@@ -17,14 +17,21 @@ spec:
     spec:
       containers:
         - name: product
-          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/product:v1
+          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/product:v2
           ports:
             - containerPort: 8080
+          resources:
+            limits:
+              cpu: 400m
+              memory: 1000Mi
+            requests:
+              cpu: 100m
+              memory: 1000Mi
           readinessProbe:
             httpGet:
               path: '/actuator/health'
               port: 8080
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 10
