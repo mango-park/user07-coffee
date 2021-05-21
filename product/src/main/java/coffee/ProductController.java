@@ -24,6 +24,14 @@ public class ProductController {
                 if (product.getPrice() > 0) {
                         price = product.getPrice();
                 }
+
+                //임의의 부하를 위한 강제 설정
+                try {
+                        Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+                } catch (InterruptedException e) {
+                        e.printStackTrace();
+                }
+
                 return price;
         }
 
