@@ -366,14 +366,14 @@ public class PolicyHandler {
 http POST http://localhost:8082/orders customerId=100 productId=100   #Success
 
 #주문상태 확인
-http POST http://localhost:8082/orders     # 주문상태 Ordered 확인
+http GET http://localhost:8082/orders/1     # 주문상태 Ordered 확인
 
 #배송 서비스 기동
 cd delivery
 mvn spring-boot:run
 
 #주문상태 확인
-http localhost:8082/orders     # 주문 상태 Waited로 변경 확인
+http GET localhost:8082/orders/1     # 주문 상태 Waited로 변경 확인
 ```
 
 
