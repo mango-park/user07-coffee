@@ -214,11 +214,11 @@ http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.
 
 # 배달 완료 처리
 http PATCH http://localhost:8084/deliveries/1 status=Completed
-http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/deliveries/1 status=Completed
+http PATCH http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/deliveries/1 status=Completed
 
 # 주문 상태 확인
 http GET http://localhost:8082/orders/1
-http POST http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders/1
+http GET http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders/1
 ```
 
 ## 동기식 호출 과 Fallback 처리
@@ -287,9 +287,6 @@ http POST http://localhost:8082/orders customerId=100 productId=100
 
 http POST http://localhost:8082/orders customerId=101 productId=101   #Success
 ```
-
-- 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
-
 
 
 
