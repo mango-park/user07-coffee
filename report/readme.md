@@ -397,7 +397,6 @@ gateway가 아래와 같이 LoadBalnacer 역할을 수행한다
     report     ClusterIP      10.100.127.177   <none>                                                                         8080/TCP         4h41m   app=report
 
 
-#( 업데이트 필요 )
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
