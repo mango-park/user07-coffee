@@ -142,6 +142,8 @@ HPA 적용
     ➜  ~ kubectl autoscale deployment gateway -n coffee --cpu-percent=25 --min=2 --max=4
     horizontalpodautoscaler.autoscaling/gateway autoscaled
 
+➜  ~ kubectl get --raw /apis/metrics.k8s.io/v1beta1
+➜  ~ kubectl apply -f components.yaml
 
 ConfigMap
 
