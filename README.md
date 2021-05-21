@@ -290,10 +290,10 @@ http POST http://localhost:8082/orders customerId=101 productId=101   #Success
 
 
 
-## 비동기식 호출 publish-subscribe
+## 비동기식 호출 (publish-subscribe)
 
-배송이 완료된 후, 주문 시스템에게 이를 알려주는 행위는 동기식이 아닌 비동기식으로 처리한다.
-- 이를 위하여 배송 상태가 Completed 된 후에 곧바로 배송완료 되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
+주문이 완료된 후, 배송 시스템에게 이를 알려주는 행위는 동기식이 아닌 비동기식으로 처리한다.
+- 이를 위하여 주문이 접수된 후에 곧바로 주문 접수 되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
  
 ```
 package coffee;
@@ -302,15 +302,31 @@ import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
 
 @Entity
-@Table(name = "Delivery_table")
-public class Delivery {
+@DynamicInsert
+@Table(name = "Order_table")
+public class Order {
 
  ...
-    @PostUpdate
-    public void onPostUpdate() {
-        StatusUpdated statusUpdated = new StatusUpdated();
-        BeanUtils.copyProperties(this, statusUpdated);
-        statusUpdated.publishAfterCommit();
+     @PostPersist
+    public void onPostPersist() throws Exception {
+
+        Integer price = OrderApplication.applicationContext.getBean(coffee.external.ProductService.class)
+                .checkProductStatus(this.getProductId());
+
+        if (price > 0) {
+            boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
+                    .checkAndModifyPoint(this.getCustomerId(), price);
+
+            if (result) {
+
+                Ordered ordered = new Ordered();
+                BeanUtils.copyProperties(this, ordered);
+                ordered.publishAfterCommit();
+
+            } else
+                throw new Exception("Customer Point - Exception Raised");
+        } else
+            throw new Exception("Product Sold Out - Exception Raised");
     }
 
 }
@@ -322,19 +338,23 @@ package coffee;
 ...
 
 @Service
-public class PolicyHandler{
+public class PolicyHandler {
+
+    @Autowired
+    DeliveryRepository deliveryRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverStatusUpdated_UpdateStatus(@Payload StatusUpdated statusUpdated) {
+    public void wheneverOrdered_WaitOrder(@Payload Ordered ordered) {
 
-        if (statusUpdated.isMe()) {
-            System.out.println("##### listener UpdateStatus : " + statusUpdated.toJson());
+        if (ordered.isMe()) {
+            System.out.println("##### listener WaitOrder : " + ordered.toJson());
 
-            Optional<Order> orderOptional = orderRepository.findById(statusUpdated.getOrderId());
-            Order order = orderOptional.get();
-            order.setStatus(statusUpdated.getStatus());
+            Delivery delivery = new Delivery();
+            delivery.setOrderId(ordered.getId());
+            delivery.setStatus("Waited");
 
-            orderRepository.save(order);
+            deliveryRepository.save(delivery);
+
         }
     }
 
