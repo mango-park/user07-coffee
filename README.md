@@ -331,7 +331,7 @@ public class Order {
 
 }
 ```
-- 주문 서비스에서는 배송상태 업데이트 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
+- 배송 서비스에서는 주문 상태 접수 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
 
 ```
 package coffee;
