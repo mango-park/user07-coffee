@@ -572,6 +572,7 @@ Shortest transaction:	        0.02
 
 
 ##ConfigMap 설정
+
 특정값을 k8s 설정으로 올리고 서비스를 기동 후, kafka 정상 접근 여부 확인한다.
 
     ➜  ~ kubectl describe cm report-config -n coffee
