@@ -284,10 +284,6 @@ mvn spring-boot:run
 
 #주문처리
 http POST http://localhost:8082/orders customerId=100 productId=100   #Success
-
-
-http POST http://localhost:8082/orders customerId=100 productId=100
-
 http POST http://localhost:8082/orders customerId=101 productId=101   #Success
 ```
 
