@@ -21,7 +21,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - [헥사고날 아키텍처 다이어그램 도출](#헥사고날 아키텍처 다이어그램 도출)
     
   - [구현:](#구현-)
-    - [DDD 의 적용](# DDD 의 적용)
+    - [DDD 의 적용](#DDD 의 적용)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
     - [비동기식 호출 과 Eventual Consistency](#비동기식 호출 publish-subscribe)
 
