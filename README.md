@@ -22,8 +22,8 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
   - [구현:](#구현-)
     - [DDD 의 적용](#ddd-의-적용)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
-    - [비동기식 호출 과 Eventual Consistency](#동기식-호출-과-Fallback-처리)
-    - [비동기식 호출 과 Eventual Consistency](# 비동기식 호출,publish-subscribe)
+    - [비동기식 호출 과 Eventual Consistency](#비동기식 호출 publish-subscribe)
+    - [비동기식 호출 과 Eventual Consistency](## 비동기식 호출 publish-subscribe)
   - [운영](#운영)
     - [CI/CD 설정](#cicd설정)
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
@@ -290,7 +290,7 @@ http POST http://localhost:8082/orders customerId=101 productId=101   #Success
 
 
 
-## 비동기식 호출 (publish-subscribe)
+## 비동기식 호출 publish-subscribe
 
 배송이 완료된 후, 주문 시스템에게 이를 알려주는 행위는 동기식이 아닌 비동기식으로 처리한다.
 - 이를 위하여 배송 상태가 Completed 된 후에 곧바로 배송완료 되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
