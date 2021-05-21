@@ -22,6 +22,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
   - [구현:](#구현-)
     - [DDD 의 적용](#ddd-의-적용)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
+    - [비동기식 호출 과 Eventual Consistency](#동기식-호출-과-Fallback-처리)
     - [비동기식 호출 과 Eventual Consistency](# 비동기식 호출,publish-subscribe)
   - [운영](#운영)
     - [CI/CD 설정](#cicd설정)
