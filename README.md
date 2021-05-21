@@ -367,7 +367,7 @@ http localhost:8082/orders     # 주문 상태 Waited로 변경 확인
 # 운영
 
 ## CI/CD 설정
-SirenOrder의 ERC 구성은 아래와 같다.
+SirenOrder의 ECR 구성은 아래와 같다.
 ![image](https://user-images.githubusercontent.com/20352446/118971683-ad6b4780-b9aa-11eb-893a-1cd05a95ea11.png)
 
 사용한 CI/CD 도구는 AWS CodeBuild
