@@ -11,26 +11,22 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 
 - [예제 - SirenOrder](#---)
   - [서비스 시나리오](#서비스-시나리오)
-  - [분석/설계](#분석설계-)
-    - [DDD 의 적용](#ddd-의-적용)   
-    - [Event Storming 결과](#Event Storming 결과)
-    - [이벤트 도출](#이벤트 도출)    
-    - [바운디드 컨텍스트](#바운디드 컨텍스트)
-    - [완성된 1차 모형](#완성된 1차 모형)
-    - [기능 요구사항에 대한 검증](#기능적 요구사항을 커버하는지 검증)
-    - [비기능 요구사항에 대한 검증](#비기능 요구사항에 대한 검증)
-    - [헥사고날 아키텍처 다이어그램 도출](# 헥사고날 아키텍처 다이어그램 도출)
-    
-  - [구현:](#구현-)
+  - [분석/설계](#분석설계)
+    - [Event Storming 결과](#Event-Storming-결과)
+    - [완성된 1차 모형](#완성된-1차-모형)
+    - [헥사고날 아키텍처 다이어그램 도출](#헥사고날-아키텍처-다이어그램-도출)
+       
+  - [구현:](#구현)
     - [DDD 의 적용](#ddd-의-적용)   
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
     - [비동기식 호출 과 Eventual Consistency](#동기식-호출-과-Fallback-처리)
+    
   - [운영](#운영)
-    - [CI/CD 설정](#cicd설정)
-    - [Kubernetes 설정](#cicd설정)
-    - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
-    - [오토스케일 아웃](#오토스케일-아웃)
-    - [무정지 재배포](#무정지-재배포)
+    - [CI/CD 설정](#CI/CD-설정)
+    - [Kubernetes 설정](#Kubernetes-설정)
+    - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출/서킷-브레이킹/장애격리)
+    - [오토스케일 아웃](#Autoscale-(HPA))
+    - [무정지 재배포](#Zero-downtime-deploy)
  
  
 
@@ -38,7 +34,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 
 [ 기능적 요구사항 ]
 1. 고객이 회원 가입을 한다
-2. 신규 회원 가입을 한 고객에게 포인트를 적립해 준다(신규 회원 가입 포인트 : ?? )
+2. 신규 회원 가입을 한 고객에게 포인트를 적립해 준다
 3. 고객이 주문하기 전에 주문 가능한 상품 메뉴를 선택한다
 4. 고객이 선택한 메뉴에 대해서 주문을 한다
 5. 주문이 되면 주문 내역이 Delivery 서비스에 전달되고, 고객 포인트를 적립한다
@@ -54,7 +50,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     1. Delivery 서비스가 중단되더라도 주문은 365일 24시간 받을 수 있어야 한다  Async (event-driven), Eventual Consistency
     1. 주문이 완료된 상품이 Delivery 서비스가 과중되더라도 주문 완료 정보를 Delivery 서비스가 정상화 된 이후에 수신한다 Circuit breaker, fallback
 1. 성능
-    1. 상점 주인은 Report 서비스를 통해서 확인할 수 있어야 한다  CQRS
+    1. 상점 주인은 Report 서비스를 통해서 주문/매출 정보를 확인할 수 있어야 한다  CQRS
     1. 주문 접수 상태가 바뀔때마다 고객에게 알림을 줄 수 있어야 한다  Event driven
 
 
@@ -79,8 +75,8 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 ![image](https://user-images.githubusercontent.com/74900977/118925812-4df54380-b97a-11eb-9591-a924fe52e9e0.png)
 
     - 도메인 서열 분리 
-        - Core Domain:  Order, Product, Delivery : 없어서는 안될 핵심 서비스이며, 연견 Up-time SLA 수준을 99.999% 목표, 배포주기 : 1주일 1회 미만, Delivery 1개월 1회 미만
-        - Supporting Domain: customer, Report : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기 : 1주일 1회 이상을 기준 ( 각팀 배포 주기 Policy 적용 )
+        - Core Domain:  Customer, Order, Product, Delivery : 없어서는 안될 핵심 서비스이며, 연견 Up-time SLA 수준을 99.999% 목표, 배포주기 : 1주일 1회 미만, Delivery 1개월 1회 미만
+        - Supporting Domain: Report : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기 : 1주일 1회 이상을 기준 ( 각팀 배포 주기 Policy 적용 )
 
 ### 완성된 1차 모형
 
@@ -107,7 +103,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 
     - 마이크로 서비스를 넘나드는 시나리오에 대한 트랜잭션 처리
     - 판매 가능 상품 :  판매가 가능한 상품만 주문 메뉴에 노출됨 , ACID 트랜잭션, Request-Response 방식 처리
-    - 주문 완료시 상품 접숙 및 Delivery:  Order 서비스에서 Delivery 마이크로서비스로 주문요청이 전달되는 과정에 있어서 Delivery 마이크로 서비스가 별도의 배포주기를 가지기 때문에 Eventual Consistency 방식으로 트랜잭션 처리함.
+    - 주문 완료시 상품 접수 및 Delivery:  Order 서비스에서 Delivery 마이크로서비스로 주문요청이 전달되는 과정에 있어서 Delivery 마이크로 서비스가 별도의 배포주기를 가지기 때문에 Eventual Consistency 방식으로 트랜잭션 처리함.
     - Product, Customer, Report MicroService 트랜잭션:  주문 접수 상태, 상품 준비 상태 등 모든 이벤트에 대해 Kafka를 통한 Async 방식 처리, 데이터 일관성의 시점이 크리티컬하지 않은 모든 경우가 대부분이라 판단, Eventual Consistency 를 기본으로 채택함.
 
 
@@ -373,14 +369,14 @@ public class PolicyHandler {
 http POST http://localhost:8082/orders customerId=100 productId=100   #Success
 
 #주문상태 확인
-http POST http://localhost:8082/orders     # 주문상태 Ordered 확인
+http GET http://localhost:8082/orders/1     # 주문상태 Ordered 확인
 
 #배송 서비스 기동
 cd delivery
 mvn spring-boot:run
 
 #주문상태 확인
-http localhost:8082/orders     # 주문 상태 Waited로 변경 확인
+http GET localhost:8082/orders/1     # 주문 상태 Waited로 변경 확인
 ```
 
 
