@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: order
-  namespace: coffee
+  namespace: user07-coffee
   labels:
     app: order
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: order
-          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/order:v1
+          image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-order:v1
           ports:
             - containerPort: 8080
           resources:

@@ -28,6 +28,10 @@ spring:
           uri: http://localhost:8085
           predicates:
             - Path= /reports/**
+        - id: benefit
+          uri: http://localhost:8086
+          predicates:
+            - Path=/benefits/** 
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -67,6 +71,10 @@ spring:
           uri: http://report:8080
           predicates:
             - Path= /reports/**
+        - id: benefit
+          uri: http://benefit:8080
+          predicates:
+            - Path=/benefits/** 
       globalcors:
         corsConfigurations:
           '[/**]':

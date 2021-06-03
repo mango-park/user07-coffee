@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: product
-  namespace: coffee
+  namespace: user07-coffee
   labels:
     app: product
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: product
-          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/product:v4
+          image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-product:v1
           ports:
             - containerPort: 8080
           resources:

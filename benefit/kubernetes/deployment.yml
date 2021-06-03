@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: delivery
+  name: benefit
   namespace: user07-coffee
   labels:
-    app: delivery
+    app: benefit
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: delivery
+      app: benefit
   template:
     metadata:
       labels:
-        app: delivery
+        app: benefit
     spec:
       containers:
-        - name: delivery
-          image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-delivery:v1
+        - name: benefit
+          image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-benefit:v1
           ports:
             - containerPort: 8080
           readinessProbe:

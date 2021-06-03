@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: report
-  namespace: coffee
+  namespace: user07-coffee
   labels:
     app: report
 spec:
@@ -21,7 +21,7 @@ spec:
       #      claimName: efs-claim
       containers:
         - name: report
-          image: 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/report:v5
+          image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-report:v1
           ports:
             - containerPort: 8080
           envFrom:

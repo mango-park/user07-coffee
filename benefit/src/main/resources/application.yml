@@ -24,11 +24,11 @@ spring:
                   serde: org.apache.kafka.common.serialization.Serdes$StringSerde
       bindings:
         event-in:
-          group: order
-          destination: coffee
+          group: benefit
+          destination: sirenorder
           contentType: application/json
         event-out:
-          destination: coffee
+          destination: sirenorder
           contentType: application/json
 
 logging:
@@ -36,13 +36,7 @@ logging:
     org.hibernate.type: trace
     org.springframework.cloud: debug
 server:
-  port: 8082
-
-feign:
-  client:
-    url:
-      customerUrl: http://localhost:8081
-      productUrl: http://localhost:8083
+  port: 8086
 ---
 
 spring:
@@ -62,22 +56,9 @@ spring:
                   serde: org.apache.kafka.common.serialization.Serdes$StringSerde
       bindings:
         event-in:
-          group: order
-          destination: coffee
+          group: benefit
+          destination: sirenorder
           contentType: application/json
         event-out:
-          destination: coffee
+          destination: sirenorder
           contentType: application/json
-feign:
-  client:
-    url:
-      customerUrl: http://customer:8080
-      productUrl: http://product:8080
-      benefitUrl: http://benefit:8080
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 610

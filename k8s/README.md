@@ -69,6 +69,14 @@ k8s에 kafka 설치 및 실행
 ECR 생성
     customer/delivery/gateway/order/product 개별 수행
 
+aws ecr create-repository --repository-name user07-customer --image-scanning-configuration scanOnPush=true --region ap-northeast-1
+aws ecr create-repository --repository-name user07-order --image-scanning-configuration scanOnPush=true --region ap-northeast-1
+aws ecr create-repository --repository-name user07-delivery --image-scanning-configuration scanOnPush=true --region ap-northeast-1
+aws ecr create-repository --repository-name user07-gateway --image-scanning-configuration scanOnPush=true --region ap-northeast-1
+aws ecr create-repository --repository-name user07-product --image-scanning-configuration scanOnPush=true --region ap-northeast-1
+aws ecr create-repository --repository-name user07-benefit --image-scanning-configuration scanOnPush=true --region ap-northeast-1
+aws ecr create-repository --repository-name user07-report --image-scanning-configuration scanOnPush=true --region ap-northeast-1
+
     ➜  ~ aws ecr create-repository --repository-name customer --region ap-northeast-2
     {
     "repository": {
@@ -91,7 +99,7 @@ Docker 이미지 생성 및 ECR push
     customer/delivery/gateway/order/product 개별 수행
 
     이미지 생성
-    ➜  customer (main) ✗ docker build -t 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer:v1 .
+    ➜  customer (main) ✗ docker build -t 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-benefit:v1 .
     
     이미지 확인(1회)
     ➜  customer (main) ✗ docker images
@@ -99,11 +107,11 @@ Docker 이미지 생성 및 ECR push
     740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer   v1        22ac70a0386d   2 minutes ago   164MB
 
     ECR 인증(1회)
-    ➜  customer (main) ✗ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/
+    ➜  customer (main) ✗ aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/
     Login Succeeded
 
     ECR push
-    ➜  customer (main) ✗ docker push 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer:v1
+    ➜  customer (main) ✗ docker push 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-benefit:v1
     The push refers to repository [740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer]
     d3ffee86f8ff: Pushed
     ceaf9e1ebef5: Pushed
@@ -120,21 +128,21 @@ namespace 생성
 
 Service 생성
 
-    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/coffee/product/kubernetes/service.yaml
+    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/product/kubernetes/service.yaml
     service/product created
 
 Deployment 생성
 
-    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/coffee/product/kubernetes/deployment.yml
+    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/product/kubernetes/deployment.yml
     deployment.apps/product created
     주의점: ECR image 경로가 맞아야함
 
 
 Gateway 작업
 
-    ➜  ~ kubectl create deploy gateway -n coffee --image=740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/gateway:v1
+    ➜  ~ kubectl create deploy gateway -n user07-coffee --image=879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-gateway:v1
     deployment.apps/gateway created
-    ➜  ~ kubectl expose deploy gateway -n coffee --type="LoadBalancer" --port=8080
+    ➜  ~ kubectl expose deploy gateway -n user07-coffee --type="LoadBalancer" --port=8080
     service/gateway exposed
 
 HPA 적용
@@ -147,4 +155,4 @@ HPA 적용
 
 ConfigMap
 
-    kubectl apply -f /Users/joonhopark/workspace/study/coffee/k8s/report-configmap.yml
+    kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/report/kubernetes/report-configmap.yml

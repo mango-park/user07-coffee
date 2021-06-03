@@ -5,14 +5,15 @@ import javax.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.beans.BeanUtils;
+import java.util.List;
+import java.util.Date;
 
 @Entity
-@DynamicInsert
-@Table(name = "Order_table")
+@Table(name="Order_table")
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private Long customerId;
     private Long productId;
@@ -43,11 +44,28 @@ public class Order {
                 BeanUtils.copyProperties(this, ordered);
                 ordered.publishAfterCommit();
 
+                //Following code causes dependency to external APIs
+                // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+
+//                sirenorder.external.Benefit benefit = new sirenorder.external.Benefit();
+//                // mappings goes here
+//                Application.applicationContext.getBean(sirenorder.external.BenefitService.class)
+//                        .checkAndUsed(benefit);
             } else
                 throw new Exception("Customer Point - Exception Raised");
         } else
             throw new Exception("Product Sold Out - Exception Raised");
     }
+
+    @PostUpdate
+    public void onPostUpdate(){
+        Completed completed = new Completed();
+        BeanUtils.copyProperties(this, completed);
+        completed.publishAfterCommit();
+
+
+    }
+
 
     public Long getId() {
         return id;
@@ -56,7 +74,6 @@ public class Order {
     public void setId(Long id) {
         this.id = id;
     }
-
     public Long getCustomerId() {
         return customerId;
     }
@@ -64,7 +81,6 @@ public class Order {
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
-
     public Long getProductId() {
         return productId;
     }
@@ -72,7 +88,6 @@ public class Order {
     public void setProductId(Long productId) {
         this.productId = productId;
     }
-
     public String getStatus() {
         return status;
     }
@@ -80,7 +95,6 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
-
     public Integer getWaitingNumber() {
         return waitingNumber;
     }
@@ -88,4 +102,8 @@ public class Order {
     public void setWaitingNumber(Integer waitingNumber) {
         this.waitingNumber = waitingNumber;
     }
+
+
+
+
 }
