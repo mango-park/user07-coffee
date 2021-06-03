@@ -25,10 +25,10 @@ spring:
       bindings:
         event-in:
           group: benefit
-          destination: sirenorder
+          destination: coffee
           contentType: application/json
         event-out:
-          destination: sirenorder
+          destination: coffee
           contentType: application/json
 
 logging:
@@ -60,10 +60,10 @@ spring:
       bindings:
         event-in:
           group: benefit
-          destination: sirenorder
+          destination: coffee
           contentType: application/json
         event-out:
-          destination: sirenorder
+          destination: coffee
           contentType: application/json
 test:
   configMap:

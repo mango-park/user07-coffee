@@ -1,4 +1,3 @@
-
 package coffee.external;
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,6 +11,6 @@ public interface CustomerService {
 
     @RequestMapping(method = RequestMethod.GET, path = "/customers/checkAndModifyPoint")
     public boolean checkAndModifyPoint(@RequestParam("customerId") Long customerId,
-            @RequestParam("price") Integer price);
+                                       @RequestParam("price") Integer price);
 
 }

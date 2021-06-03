@@ -18,13 +18,13 @@ public class AbstractEvent {
     String eventType;
     String timestamp;
 
-    public AbstractEvent(){
+    public AbstractEvent() {
         this.setEventType(this.getClass().getSimpleName());
         SimpleDateFormat defaultSimpleDateFormat = new SimpleDateFormat("YYYYMMddHHmmss");
         this.timestamp = defaultSimpleDateFormat.format(new Date());
     }
 
-    public String toJson(){
+    public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = null;
 
@@ -37,8 +37,8 @@ public class AbstractEvent {
         return json;
     }
 
-    public void publish(String json){
-        if( json != null ){
+    public void publish(String json) {
+        if (json != null) {
 
             /**
              * spring streams 방식
@@ -54,11 +54,11 @@ public class AbstractEvent {
         }
     }
 
-    public void publish(){
+    public void publish() {
         this.publish(this.toJson());
     }
 
-    public void publishAfterCommit(){
+    public void publishAfterCommit() {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 
             @Override
@@ -85,7 +85,7 @@ public class AbstractEvent {
         this.timestamp = timestamp;
     }
 
-    public boolean isMe(){
+    public boolean isMe() {
         return getEventType().equals(getClass().getSimpleName());
     }
 }

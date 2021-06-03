@@ -5,7 +5,7 @@ public class ModifiedPoint extends AbstractEvent {
     private Long id;
     private Integer customerPoint;
 
-    public ModifiedPoint(){
+    public ModifiedPoint() {
         super();
     }
 
@@ -16,6 +16,7 @@ public class ModifiedPoint extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Integer getCustomerPoint() {
         return customerPoint;
     }

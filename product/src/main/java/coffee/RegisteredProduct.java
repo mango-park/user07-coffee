@@ -6,7 +6,7 @@ public class RegisteredProduct extends AbstractEvent {
     private Integer price;
     private String productStatus;
 
-    public RegisteredProduct(){
+    public RegisteredProduct() {
         super();
     }
 

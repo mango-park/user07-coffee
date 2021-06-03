@@ -1,4 +1,3 @@
-
 package sirenorder;
 
 public class Completed extends AbstractEvent {
@@ -13,6 +12,7 @@ public class Completed extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getCustomerId() {
         return customerId;
     }

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: order
-          image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-order:v1
+          image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-order:v2
           ports:
             - containerPort: 8080
           resources:

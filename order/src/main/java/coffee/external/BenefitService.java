@@ -1,4 +1,3 @@
-
 package coffee.external;
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 
-@FeignClient(name="benefit", url="http://benefit:8080")
+@FeignClient(name = "benefit", url = "${feign.client.url.benefitUrl}")
 public interface BenefitService {
 
 

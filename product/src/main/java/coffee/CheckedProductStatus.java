@@ -6,7 +6,7 @@ public class CheckedProductStatus extends AbstractEvent {
     private Integer price;
     private String productStatus;
 
-    public CheckedProductStatus(){
+    public CheckedProductStatus() {
         super();
     }
 

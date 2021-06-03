@@ -18,7 +18,7 @@ public class ReportViewHandler {
     private ReportRepository reportRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void whenOrdered_then_CREATE_1 (@Payload Ordered ordered) {
+    public void whenOrdered_then_CREATE_1(@Payload Ordered ordered) {
         try {
 
             if (ordered.isMe()) {
@@ -31,7 +31,7 @@ public class ReportViewHandler {
                 // view 레파지 토리에 save
                 reportRepository.save(report);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -43,7 +43,7 @@ public class ReportViewHandler {
             if (orderWaited.isMe()) {
                 // view 객체 조회
                 List<Report> reportList = reportRepository.findByOrderId(orderWaited.getOrderId());
-                for(Report report : reportList){
+                for (Report report : reportList) {
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     report.setDeliveryId(orderWaited.getId());
                     report.setStatus(orderWaited.getStatus());
@@ -51,51 +51,54 @@ public class ReportViewHandler {
                     reportRepository.save(report);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @StreamListener(KafkaProcessor.INPUT)
     public void whenOrderReceived_then_UPDATE_2(@Payload OrderReceived orderReceived) {
         try {
             if (orderReceived.isMe()) {
                 // view 객체 조회
                 List<Report> reportList = reportRepository.findByOrderId(orderReceived.getOrderId());
-                for(Report report : reportList){
+                for (Report report : reportList) {
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     report.setStatus(orderReceived.getStatus());
                     // view 레파지 토리에 save
                     reportRepository.save(report);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @StreamListener(KafkaProcessor.INPUT)
     public void whenDeliveryCompleted_then_UPDATE_3(@Payload DeliveryCompleted deliveryCompleted) {
         try {
             if (deliveryCompleted.isMe()) {
                 // view 객체 조회
                 List<Report> reportList = reportRepository.findByOrderId(deliveryCompleted.getOrderId());
-                for(Report report : reportList){
+                for (Report report : reportList) {
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     report.setStatus(deliveryCompleted.getStatus());
                     // view 레파지 토리에 save
                     reportRepository.save(report);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @StreamListener(KafkaProcessor.INPUT)
     public void whenStatusUpdated_then_UPDATE_4(@Payload StatusUpdated statusUpdated) {
         try {
             if (statusUpdated.isMe()) {
                 // view 객체 조회
                 List<Report> reportList = reportRepository.findByOrderId(statusUpdated.getOrderId());
-                for(Report report : reportList){
+                for (Report report : reportList) {
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     report.setDeliveryId(statusUpdated.getId());
                     report.setStatus(statusUpdated.getStatus());
@@ -103,7 +106,7 @@ public class ReportViewHandler {
                     reportRepository.save(report);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

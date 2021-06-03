@@ -2,9 +2,9 @@ steps:
   - id: 'build'
     name: 'gcr.io/cloud-builders/mvn'
     args: [
-      'clean',
-      'package',
-      '-Dmaven.test.skip=true'
+        'clean',
+        'package',
+        '-Dmaven.test.skip=true'
     ]
   ### Build
   - id: 'docker build'
@@ -77,7 +77,7 @@ steps:
                     - containerPort: 8080
         EOF
 substitutions:
-    _PROJECT_NAME: gateway
+  _PROJECT_NAME: gateway
 options:
   env:
     #    # location/name of GKE cluster (used by all kubectl commands)

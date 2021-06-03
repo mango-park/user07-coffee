@@ -5,7 +5,7 @@ public class RegisteredCustomer extends AbstractEvent {
     private Long id;
     private Integer customerPoint;
 
-    public RegisteredCustomer(){
+    public RegisteredCustomer() {
         super();
     }
 
@@ -16,6 +16,7 @@ public class RegisteredCustomer extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Integer getCustomerPoint() {
         return customerPoint;
     }

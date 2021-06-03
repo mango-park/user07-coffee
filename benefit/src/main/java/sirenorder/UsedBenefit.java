@@ -4,7 +4,7 @@ public class UsedBenefit extends AbstractEvent {
 
     private Long id;
 
-    public UsedBenefit(){
+    public UsedBenefit() {
         super();
     }
 

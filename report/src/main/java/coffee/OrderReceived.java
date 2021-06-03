@@ -14,6 +14,7 @@ public class OrderReceived extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getOrderId() {
         return orderId;
     }
@@ -21,6 +22,7 @@ public class OrderReceived extends AbstractEvent {
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
+
     public String getStatus() {
         return status;
     }
@@ -28,6 +30,7 @@ public class OrderReceived extends AbstractEvent {
     public void setStatus(String status) {
         this.status = status;
     }
+
     public Integer getWaitingNumber() {
         return waitingNumber;
     }

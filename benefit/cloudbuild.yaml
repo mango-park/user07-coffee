@@ -10,8 +10,8 @@ steps:
   - id: 'build'
     name: 'gcr.io/cloud-builders/mvn'
     args: [
-      'clean',
-      'package'
+        'clean',
+        'package'
       #      '-Dmaven.test.skip=true'
     ]
   #    waitFor: ['test']

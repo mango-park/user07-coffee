@@ -15,6 +15,7 @@ public class Ordered extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getCustomerId() {
         return customerId;
     }
@@ -22,6 +23,7 @@ public class Ordered extends AbstractEvent {
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
+
     public Long getProductId() {
         return productId;
     }
@@ -29,6 +31,7 @@ public class Ordered extends AbstractEvent {
     public void setProductId(Long productId) {
         this.productId = productId;
     }
+
     public String getStatus() {
         return status;
     }
@@ -36,6 +39,7 @@ public class Ordered extends AbstractEvent {
     public void setStatus(String status) {
         this.status = status;
     }
+
     public String getBenefitUseYn() {
         return benefitUseYn;
     }

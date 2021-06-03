@@ -13,6 +13,7 @@ public class OrderWaited extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getOrderId() {
         return orderId;
     }
@@ -20,6 +21,7 @@ public class OrderWaited extends AbstractEvent {
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
+
     public String getStatus() {
         return status;
     }

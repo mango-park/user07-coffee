@@ -1,6 +1,7 @@
 package coffee;
 
 import javax.persistence.*;
+
 import org.springframework.beans.BeanUtils;
 
 @Entity
