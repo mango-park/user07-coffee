@@ -22,10 +22,7 @@ public class Benefit {
         UsedBenefit usedBenefit = new UsedBenefit();
         BeanUtils.copyProperties(this, usedBenefit);
         usedBenefit.publishAfterCommit();
-
-
     }
-
 
     public Long getId() {
         return id;
@@ -50,6 +47,4 @@ public class Benefit {
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
-
-
 }

@@ -21,7 +21,7 @@ public class PolicyHandler{
 
         if (!completed.validate()) return;
 
-        Optional<Store> storeOptional = storeRepository.findById(1L);
+        Optional<Store> storeOptional = storeRepository.findById(100L);
 
         if (storeOptional.isPresent()) {
             Store store = storeOptional.get();

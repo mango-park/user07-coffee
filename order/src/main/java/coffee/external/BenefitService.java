@@ -11,7 +11,6 @@ import java.util.Date;
 @FeignClient(name = "benefit", url = "${feign.client.url.benefitUrl}")
 public interface BenefitService {
 
-
     @RequestMapping(method = RequestMethod.GET, path = "/benefits/checkAndUsed")
     public boolean checkAndUsed(@RequestParam("customerId") Long customerId);
 }
