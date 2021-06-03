@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ing
+spec:
+  rules:
+  - host: a4e9a4ceacc174813be5e3805fb26a68-396411177.ap-northeast-1.elb.amazonaws.com
+    http:
+      paths:
+      - backend:
+          serviceName: benefit
+          servicePort: 8080
+        path: /benefits
+      - backend:
+          serviceName: customer
+          servicePort: 8080
+        path: /customers
+      - backend:
+          serviceName: delivery
+          servicePort: 8080
+        path: /deliveries
+      - backend:
+          serviceName: order
+          servicePort: 8080
+        path: /orders
+      - backend:
+          serviceName: product
+          servicePort: 8080
+        path: /products
+      - backend:
+          serviceName: report
+          servicePort: 8080
+        path: /reports
