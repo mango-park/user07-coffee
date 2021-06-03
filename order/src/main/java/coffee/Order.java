@@ -32,43 +32,6 @@ public class Order {
 
     @PostPersist
     public void onPostPersist() throws Exception {
-
-//        Integer price = OrderApplication.applicationContext.getBean(coffee.external.ProductService.class)
-//                .checkProductStatus(this.getProductId());
-//
-//        System.out.println("price: "+price);
-//
-//        if (price > 0) {
-//
-//
-//            boolean benefitResult = OrderApplication.applicationContext.getBean(coffee.external.BenefitService.class)
-//                    .checkAndUsed(this.getCustomerId());
-//
-//            System.out.println("checkAndUsed benefitResult: "+benefitResult);
-//
-//            if (benefitResult) {
-//                boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
-//                        .checkAndModifyPoint(this.getCustomerId(), price);
-//
-//                System.out.println("checkAndModifyPoint result: "+result);
-//                if (result) {
-//
-//                    System.out.println("ordered.publishAfterCommit");
-//                    Ordered ordered = new Ordered();
-//                    BeanUtils.copyProperties(this, ordered);
-//                    ordered.publishAfterCommit();
-//
-//                    //Following code causes dependency to external APIs
-//                    // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
-//
-//                } else
-//                    throw new Exception("Customer Point - Exception Raised");
-//            } else {
-//                throw new Exception("Benefit Stamp - Exception Raised");
-//            }
-//        } else
-//            throw new Exception("Product Sold Out - Exception Raised");
-
         System.out.println("ordered.publishAfterCommit");
         Ordered ordered = new Ordered();
         BeanUtils.copyProperties(this, ordered);
@@ -77,11 +40,18 @@ public class Order {
 
     @PostUpdate
     public void onPostUpdate() {
-        Completed completed = new Completed();
-        BeanUtils.copyProperties(this, completed);
-        completed.publishAfterCommit();
 
+        System.out.println("ordered.onPostUpdate:" + this);
 
+        if ("Completed".equals(this.status)) {
+            Completed completed = new Completed();
+            BeanUtils.copyProperties(this, completed);
+            completed.publishAfterCommit();
+        } else {
+
+            System.out.println("ordered.onPostUpdate:" + this);
+            System.out.println("OrderWaited Nothing");
+        }
     }
 
 

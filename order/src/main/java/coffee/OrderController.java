@@ -27,7 +27,7 @@ public class OrderController {
         Order order = new Order();
 
         if (price > 0) {
-            boolean benefitResult = false;
+            boolean benefitResult = true;
             if ("Y".equals(benefitUseYn)) {
                 benefitResult = OrderApplication.applicationContext.getBean(coffee.external.BenefitService.class)
                         .checkAndUsed(customerId);
@@ -46,11 +46,6 @@ public class OrderController {
                     order.setProductId(productId);
 
                     orderRepository.save(order);
-
-//                    System.out.println("ordered.publishAfterCommit");
-//                    Ordered ordered = new Ordered();
-//                    //BeanUtils.copyProperties(this, ordered);
-//                    ordered.publishAfterCommit();
 
                     //Following code causes dependency to external APIs
                     // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
