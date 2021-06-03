@@ -34,25 +34,36 @@ public class Order {
         Integer price = OrderApplication.applicationContext.getBean(coffee.external.ProductService.class)
                 .checkProductStatus(this.getProductId());
 
+        System.out.println("price: "+price);
+
         if (price > 0) {
-            boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
-                    .checkAndModifyPoint(this.getCustomerId(), price);
 
-            if (result) {
 
-                Ordered ordered = new Ordered();
-                BeanUtils.copyProperties(this, ordered);
-                ordered.publishAfterCommit();
+            boolean benefitResult = OrderApplication.applicationContext.getBean(coffee.external.BenefitService.class)
+                    .checkAndUsed(this.getCustomerId());
 
-                //Following code causes dependency to external APIs
-                // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+            System.out.println("checkAndUsed benefitResult: "+benefitResult);
 
-//                sirenorder.external.Benefit benefit = new sirenorder.external.Benefit();
-//                // mappings goes here
-//                Application.applicationContext.getBean(sirenorder.external.BenefitService.class)
-//                        .checkAndUsed(benefit);
-            } else
-                throw new Exception("Customer Point - Exception Raised");
+            if (benefitResult) {
+                boolean result = OrderApplication.applicationContext.getBean(coffee.external.CustomerService.class)
+                        .checkAndModifyPoint(this.getCustomerId(), price);
+
+                System.out.println("checkAndModifyPoint result: "+result);
+                if (result) {
+
+                    System.out.println("ordered.publishAfterCommit");
+                    Ordered ordered = new Ordered();
+                    BeanUtils.copyProperties(this, ordered);
+                    ordered.publishAfterCommit();
+
+                    //Following code causes dependency to external APIs
+                    // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+
+                } else
+                    throw new Exception("Customer Point - Exception Raised");
+            } else {
+                throw new Exception("Benefit Stamp - Exception Raised");
+            }
         } else
             throw new Exception("Product Sold Out - Exception Raised");
     }

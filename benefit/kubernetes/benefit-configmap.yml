@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: benefit-config
+  namespace: user07-coffee
+data:
+  STAMP_DEDUCTION_COUNT: "2"

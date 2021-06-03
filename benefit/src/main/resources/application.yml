@@ -37,6 +37,9 @@ logging:
     org.springframework.cloud: debug
 server:
   port: 8086
+test:
+  configMap:
+    stampDeductionCount: ${STAMP_DEDUCTION_COUNT}
 ---
 
 spring:
@@ -62,3 +65,6 @@ spring:
         event-out:
           destination: sirenorder
           contentType: application/json
+test:
+  configMap:
+    stampDeductionCount: ${STAMP_DEDUCTION_COUNT}

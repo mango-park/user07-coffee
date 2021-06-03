@@ -100,6 +100,7 @@ Docker 이미지 생성 및 ECR push
 
     이미지 생성
     ➜  customer (main) ✗ docker build -t 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-benefit:v1 .
+docker build -t 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-order:v1 .
     
     이미지 확인(1회)
     ➜  customer (main) ✗ docker images
@@ -111,6 +112,7 @@ Docker 이미지 생성 및 ECR push
     Login Succeeded
 
     ECR push
+docker push 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-order:v1
     ➜  customer (main) ✗ docker push 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-benefit:v1
     The push refers to repository [740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/customer]
     d3ffee86f8ff: Pushed
@@ -133,10 +135,10 @@ Service 생성
 
 Deployment 생성
 
-    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/product/kubernetes/deployment.yml
+    ➜  ~ kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/benefit/kubernetes/deployment.yml
     deployment.apps/product created
     주의점: ECR image 경로가 맞아야함
-
+kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/order/kubernetes/deployment.yml
 
 Gateway 작업
 
@@ -156,3 +158,4 @@ HPA 적용
 ConfigMap
 
     kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/report/kubernetes/report-configmap.yml
+kubectl apply -f /Users/joonhopark/workspace/study/user07-coffee/benefit/kubernetes/benefit-configmap.yml

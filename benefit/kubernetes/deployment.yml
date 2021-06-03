@@ -20,6 +20,9 @@ spec:
           image: 879772956301.dkr.ecr.ap-northeast-1.amazonaws.com/user07-benefit:v1
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: benefit-config
           readinessProbe:
             httpGet:
               path: '/actuator/health'

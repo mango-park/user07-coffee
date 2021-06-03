@@ -5,4 +5,4 @@ metadata:
   namespace: user07-coffee
 data:
   TEXT1: my-kafka.kafka.svc.cluster.local:9092
-  TEXT2: Welcome
+  STAMP_DEDUCTION_COUNT: 2
