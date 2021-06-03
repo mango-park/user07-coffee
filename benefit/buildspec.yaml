@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    _PROJECT_NAME: "report"
+    _PROJECT_NAME: "benefit"
 
 phases:
   install:
