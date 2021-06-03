@@ -75,6 +75,10 @@ spring:
           uri: http://benefit:8080
           predicates:
             - Path=/benefits/**
+        - id: store
+          uri: http://store:8080
+          predicates:
+            - Path=/stores/**
       globalcors:
         corsConfigurations:
           '[/**]':
