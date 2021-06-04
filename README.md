@@ -211,12 +211,10 @@ public class Benefit {
 ```
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 ```
-package coffee;
+@RepositoryRestResource(collectionResourceRel = "benefits", path = "benefits")
+public interface BenefitRepository extends PagingAndSortingRepository<Benefit, Long> {
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
-public interface OrderRepository extends PagingAndSortingRepository<Order, Long> {
-    public int countByStatus(String status);
+    Optional<Benefit> findTop1ByCustomerId(Long customerId);
 }
 ```
 - 적용 후 REST API 의 테스트
