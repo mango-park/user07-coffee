@@ -382,11 +382,11 @@ curl --location --request GET 'http://a4e9a4ceacc174813be5e3805fb26a68-396411177
 ## CICD 설정
 
 사용한 CI/CD 도구는 AWS CodeBuild
-![image](https://user-images.githubusercontent.com/20352446/120649609-eaa9fc00-c4b7-11eb-8a14-4e2c3a9a4e40.png)
+![image](https://user-images.githubusercontent.com/20352446/120729917-4d80af00-c51b-11eb-84c1-0d04b833f4a2.png)
 GitHub Webhook이 동작하여 Docker image가 자동 생성 및 ECR 업로드 된다.
 (pipeline build script 는 benefit 폴더 이하에 buildspec.yaml 에 포함)
-![image](https://user-images.githubusercontent.com/20352446/120649775-188f4080-c4b8-11eb-9511-f5b5b3dbc58b.png)
-참고로 작업의 편의를 위해 대표로 하나의 git repository를 사용하였으며, 이미지 태그의 v가 붙은 것은 수작업 이미지다.
+![image](https://user-images.githubusercontent.com/20352446/120729843-232ef180-c51b-11eb-9102-6c257eeefb13.png)
+참고로 작업의 편의를 위해 대표로 하나의 git repository를 사용하였다.
 
 
 ## Kubernetes 설정
@@ -416,10 +416,6 @@ gateway가 아래와 같이 LoadBalnacer 역할을 수행한다
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
 # application.yml
-feign:
-  hystrix:
-    enabled: true
-    
 hystrix:
   command:
     # 전역설정
