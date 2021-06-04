@@ -138,6 +138,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 
 ![image](https://user-images.githubusercontent.com/20352446/120730894-730eb800-c51d-11eb-9ae2-5524ae515e86.png)
 
+헥사고날 아키텍처 다이어그램의 경우, delivery와 product의 기능을 갖는 benefit과 delivery 구성과 유사한 store 다이어그램이 추가되었다.
 
 ### 기능적 요구사항에 대한 검증
     - 고객은 스탬프를 통해 상품을 구매할 수 있다 (ok)
@@ -147,6 +148,8 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - 스탬프 서비스 미운영시 스탬프를 통한 상품 구매는 불가하다 (ok)    
     - Store 서비스는 주문 서비스에 영향을 주어서는 안된다.(ok)
     - 혜택 서비스 장애 발생시 조치가 완료되면 고객에게 정상적으로 스탬프를 자동 지급한다. (ok)
+
+
 
 # 구현:
 
