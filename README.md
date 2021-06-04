@@ -1,4 +1,4 @@
-# 1조 프로젝트 : SirenOrder
+# 개인 프로젝트 : SirenOrder 업그레이드 (+혜택 및 상점)
 
 ![image](https://user-images.githubusercontent.com/74900977/118920002-81cb6b80-b970-11eb-8ca7-a5e62d96a77e.png)
 
@@ -30,7 +30,7 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출/서킷-브레이킹/장애격리)
     - [오토스케일 아웃](#Autoscale-HPA)
     - [무정지 재배포](#Zero-downtime-deploy)
- 
+    - [셀프힐링](#livenessProbe) 
  
 
 # 서비스 시나리오
@@ -40,13 +40,11 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 2. 신규 회원 가입을 한 고객에게 포인트를 적립해 준다
 3. 고객이 주문하기 전에 주문 가능한 상품 메뉴를 선택한다
 4. 고객이 선택한 메뉴에 대해서 주문을 한다
-   4.1 고객은 본인의 스탬프를 활용하여 주문 가능
 5. 주문이 되면 주문 내역이 Delivery 서비스에 전달되고, 고객 포인트를 적립한다
 6. 접수된 주문은 Wating 상태로 접수가 되고, 고객한테 접수 대기 번호를 발송한다
-7. 주문한 상품이 완료되면 고객한테 상품 주문 완료를 전달한다
-   7.1 주문이 완료되면 고객에게 스탬프를 부여
+7. 주문한 상품이 완료되면 고객한테 상품 주문 완료를 전달한다   
 8. 상점 주인에게 주문/매출 정보를 조회할수 있는 Report 서비스를 제공한다.
-    9 상점 주인은 직접 고객의 스탬프 적립 가능
+    
 
 [ 비기능적 요구사항 ]
 1. 트랜잭션
@@ -58,12 +56,26 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     1. 상점 주인은 Report 서비스를 통해서 주문/매출 정보를 확인할 수 있어야 한다  CQRS
     1. 주문 접수 상태가 바뀔때마다 고객에게 알림을 줄 수 있어야 한다  Event driven
 
+## 신규 요구사항 접수
+[ 기능적 요구사항 ]
+1. 고객은 스탬프를 통해 상품을 구매할 수 있다.
+2. 주문이 완료되면 고객에게 스탬프를 부여한다.
+3. 상점 주인은 직접 고객의 스탬프 적립 가능하다.
+4. 상점 주인은 새로운 상점을 차릴 수 있다.
+
+[ 비기능적 요구사항 ]
+1. 트랜잭션
+    1. 스탬프가 사용 가능할 때마 스탬프를 통한 상품 구매가 가능하다. Sync 호출
+1. 장애격리
+    1. Store 서비스가 중단되더라도 주문은 365일 24시간 받을 수 있어야 한다. Async (event-driven), Eventual Consistency
+    2. 주문 완료시 혜택(benefit) 서비스가 과중되더라도 서비스 정상화 후, 스탬프 적립 처리를 한다. Circuit breaker, fallback
+1. 성능
+    1. 상점 주인은 Store 서비스를 통해서도 매출 합계 정보 확인이 가능하다. CQRS
 
 # 분석/설계
 
 ## Event Storming 결과
 * MSAEz 로 모델링한 이벤트스토밍 결과:  http://www.msaez.io/#/storming/vMFi38LnlbRPvs4teOm6f35Ufm42/mine/724da5741331e4aaec07896247b703be
-
 
 ### 이벤트 도출
 ![image](https://user-images.githubusercontent.com/74900977/118924080-8ba49d00-b977-11eb-82f2-4db4f4be71fa.png)
@@ -104,15 +116,13 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
 
 ### 비기능 요구사항에 대한 검증
 
-![image](https://user-images.githubusercontent.com/20352446/120610088-c5a09380-c48d-11eb-9e31-b05c540cbfa2.png)
+![image](https://user-images.githubusercontent.com/74900977/118941404-a6cdd780-b98c-11eb-9d26-a17a83a5c9ee.png)
 
 
     - 마이크로 서비스를 넘나드는 시나리오에 대한 트랜잭션 처리
     - 판매 가능 상품 :  판매가 가능한 상품만 주문 메뉴에 노출됨 , ACID 트랜잭션, Request-Response 방식 처리
     - 주문 완료시 상품 접수 및 Delivery:  Order 서비스에서 Delivery 마이크로서비스로 주문요청이 전달되는 과정에 있어서 Delivery 마이크로 서비스가 별도의 배포주기를 가지기 때문에 Eventual Consistency 방식으로 트랜잭션 처리함.
     - Product, Customer, Report MicroService 트랜잭션:  주문 접수 상태, 상품 준비 상태 등 모든 이벤트에 대해 Kafka를 통한 Async 방식 처리, 데이터 일관성의 시점이 크리티컬하지 않은 모든 경우가 대부분이라 판단, Eventual Consistency 를 기본으로 채택함.
-
-
 
 
 ## 헥사고날 아키텍처 다이어그램 도출
@@ -123,6 +133,20 @@ SirenOrder 서비스를 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설�
     - 호출관계에서 PubSub 과 Req/Resp 를 구분함
     - 서브 도메인과 바운디드 컨텍스트의 분리:  각 팀의 KPI 별로 아래와 같이 관심 구현 스토리를 나눠가짐
 
+
+## 신규 서비스 구성
+
+![image](https://user-images.githubusercontent.com/20352446/120730894-730eb800-c51d-11eb-9ae2-5524ae515e86.png)
+
+
+### 기능적 요구사항에 대한 검증
+    - 고객은 스탬프를 통해 상품을 구매할 수 있다 (ok)
+    - 주문이 완료되면 고객에게 스탬프를 부여 (ok)
+    - 상점 주인이 직접 고객의 스탬프를 적립할 수 있다 (ok)
+### 비기능 요구사항에 대한 검증
+    - 스탬프 서비스 미운영시 스탬프를 통한 상품 구매는 불가하다 (ok)    
+    - Store 서비스는 주문 서비스에 영향을 주어서는 안된다.(ok)
+    - 혜택 서비스 장애 발생시 조치가 완료되면 고객에게 정상적으로 스탬프를 자동 지급한다. (ok)
 
 # 구현:
 
