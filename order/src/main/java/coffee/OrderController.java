@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ public class OrderController {
     @Autowired
     OrderRepository orderRepository;
 
+    @HystrixCommand
     @RequestMapping(value = "/orders/order", method = RequestMethod.GET)
     public void order(@RequestParam("customerId") Long customerId, @RequestParam("productId") Long productId, @RequestParam("benefitUseYn") String benefitUseYn) throws Exception {
 

@@ -498,54 +498,38 @@ Shortest transaction:	        0.09
 horizontalpodautoscaler.autoscaling/benefit autoscaled
 
 ➜  ~ kubectl get hpa -n user07-coffee
-NAME      REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
-benefit   Deployment/benefit   <unknown>/10%   1         4         1          6m49s
+NAME      REFERENCE            TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+benefit   Deployment/benefit   2%/10%    1         4         1          16s
 ```
-- 부하를 2분간 유지한다.
+- 부하를 1분간 유지한다.
 ```
-➜  ~ siege -c100 -t60S -r10 --content-type "application/json" 'http://a4e9a4ceacc174813be5e3805fb26a68-396411177.ap-northeast-1.elb.amazonaws.com:8080/orders/order?customerId=1000&productId=1&benefitUseYn=Y'
+➜  ~ siege -c50 -t60S -r10 --content-type "application/json" 'http://a4e9a4ceacc174813be5e3805fb26a68-396411177.ap-northeast-1.elb.amazonaws.com:8080/orders/order?customerId=1000&productId=1&benefitUseYn=Y'
 ```
 - 오토스케일이 어떻게 되고 있는지 확인한다.
 ```
 ➜  ~ kubectl get deploy -n user07-coffee
 NAME       READY   UP-TO-DATE   AVAILABLE   AGE
-benefit    1/1     1            1           11h
-customer   1/1     1            1           11h
-delivery   1/1     1            1           11h
-gateway    1/1     1            1           11h
-order      1/1     1            1           11h
-product    1/1     1            1           11h
-report     1/1     1            1           11h
-store      1/1     1            1           5h19m
+benefit    1/1     1            1           5m57s
+customer   1/1     1            1           21h
+delivery   1/1     1            1           21h
+gateway    1/1     1            1           21h
+order      1/1     1            1           21h
+product    1/1     1            1           21h
+report     1/1     1            1           21h
+store      1/1     1            1           15h
 ```
 - 어느정도 시간이 흐르면 스케일 아웃이 동작하는 것을 확인
 ```
 ➜  ~ kubectl get deploy -n user07-coffee
 NAME       READY   UP-TO-DATE   AVAILABLE   AGE
-benefit    1/1     1            1           11h
-customer   1/1     1            1           11h
-delivery   1/1     1            1           11h
-gateway    1/1     1            1           11h
-order      1/1     1            1           11h
-product    1/1     1            1           11h
-report     1/1     1            1           11h
-store      1/1     1            1           5h19m
-```
-
-- Availability 가 높아진 것을 확인 (siege)
-```
-Transactions:		         995 hits
-Availability:		       82.64 %
-Elapsed time:		       59.85 secs
-Data transferred:	        0.29 MB
-Response time:		        5.11 secs
-Transaction rate:	       16.62 trans/sec
-Throughput:		        0.00 MB/sec
-Concurrency:		       84.94
-Successful transactions:         995
-Failed transactions:	         209
-Longest transaction:	       15.26
-Shortest transaction:	        0.02
+benefit    1/4     4            1           7m8s
+customer   1/1     1            1           21h
+delivery   1/1     1            1           21h
+gateway    1/1     1            1           21h
+order      1/1     1            1           21h
+product    1/1     1            1           21h
+report     1/1     1            1           21h
+store      1/1     1            1           16h
 ```
 
 
@@ -667,49 +651,49 @@ store-74d8bd6d5f-x5hvn      1/1     Running   0          2m20s
 
 
 ## 셀프힐링 (livenessProbe 설정)
-- order deployment livenessProbe
+- benefit deployment livenessProbe
 ```
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 120
-            timeoutSeconds: 2
-            periodSeconds: 5
-            successThreshold: 1
-            failureThreshold: 5
+      livenessProbe:
+        httpGet:
+          path: '/actuator/health'
+          port: 8080
+        initialDelaySeconds: 120
+        timeoutSeconds: 2
+        periodSeconds: 5
+        failureThreshold: 5
 ```
 livenessProbe 기능 점검을 위해 HPA 제거한다.
 ```
-➜  ~ kubectl get hpa -n coffee
+➜  ~ kubectl get hpa -n user07-coffee
 No resources found in coffee namespace.
 ```
 Pod 의 변화를 살펴보기 위하여 watch
 ```
-➜  ~ kubectl get -n coffee po -w
+➜  ~ kubectl get -n user07-coffee po -w
 NAME                        READY   STATUS    RESTARTS   AGE
-customer-785f544f95-mh456   1/1     Running   0          23h
-delivery-557f4d7f49-z47bx   1/1     Running   0          23h
-gateway-6886bbf85b-4hggj    1/1     Running   0          149m
-gateway-6886bbf85b-mg9fz    1/1     Running   0          22h
-order-659cd7bddf-glgjj      1/1     Running   0          22m
-product-7c5c949965-z6pqs    1/1     Running   0          131m
-report-85dd84c856-qbzbc     1/1     Running   0          16h
+benefit-85d474c889-jfd4r    1/1     Running   0          10h
+customer-675894fd5c-q464h   1/1     Running   0          11h
+delivery-564b449ffb-4mgt7   1/1     Running   0          21h
+gateway-85858bd5f6-fhlnf    1/1     Running   0          15h
+order-7b95565555-4qs7z      1/1     Running   0          17h
+product-5f69494d84-49qrp    1/1     Running   0          17h
+report-7958759448-dlwfc     1/1     Running   0          21h
+store-74d8bd6d5f-x5hvn      1/1     Running   0          10h
 ```
-order 서비스를 다운시키기 위한 부하 발생
+benefit 서비스를 다운시키기 위한 부하 발생
 ```
-➜  ~ siege -c50 -t60S -r10 --content-type "application/json" 'http://ac4ff02e7969e44afbe64ede4b2441ac-1979746227.ap-northeast-2.elb.amazonaws.com:8080/orders POST {"customerId":2, "productId":1}'
+➜  ~ siege -c100 -t60S -r10 --content-type "application/json" 'http://a4e9a4ceacc174813be5e3805fb26a68-396411177.ap-northeast-1.elb.amazonaws.com:8080/orders/order?customerId=1000&productId=1&benefitUseYn=Y'
 ```
-order Pod의 liveness 조건 미충족에 의한 RESTARTS 횟수 증가 확인
+benefit Pod의 liveness 조건에 의한 RESTARTS 횟수 증가 확인
 ```
-➜  ~ kubectl get -n coffee po -w
+➜  ~ kubectl get -n user07-coffee po -w
 NAME                        READY   STATUS    RESTARTS   AGE
-customer-785f544f95-mh456   1/1     Running   0          23h
-delivery-557f4d7f49-z47bx   1/1     Running   0          23h
-gateway-6886bbf85b-4hggj    1/1     Running   0          157m
-gateway-6886bbf85b-mg9fz    1/1     Running   0          22h
-order-659cd7bddf-glgjj      1/1     Running   1          30m
-product-7c5c949965-z6pqs    1/1     Running   0          138m
-report-85dd84c856-qbzbc     1/1     Running   0          16h
+benefit-85d474c889-jfd4r    1/1     Running   1          10h
+customer-675894fd5c-q464h   1/1     Running   0          11h
+delivery-564b449ffb-4mgt7   1/1     Running   0          21h
+gateway-85858bd5f6-fhlnf    1/1     Running   0          15h
+order-7b95565555-4qs7z      1/1     Running   0          17h
+product-5f69494d84-49qrp    1/1     Running   0          17h
+report-7958759448-dlwfc     1/1     Running   0          21h
+store-74d8bd6d5f-x5hvn      1/1     Running   0          10h
 ```
