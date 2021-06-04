@@ -417,7 +417,7 @@ GitHub Webhook이 동작하여 Docker image가 자동 생성 및 ECR 업로드 �
 ## Kubernetes 설정
 AWS EKS를 활용했으며, 추가한 namespace는 user07-coffee와 kafka로 아래와 같다.
 
-###EKS Deployment
+### EKS Deployment
 
 namespace: user07-coffee
 ![image](https://user-images.githubusercontent.com/20352446/120649987-4f655680-c4b8-11eb-8b1f-37c6e3cdc8b6.png)
@@ -426,7 +426,7 @@ namespace: kafka
 ![image](https://user-images.githubusercontent.com/20352446/120650086-65731700-c4b8-11eb-9bd7-8a4dd68262fa.png)
 
 
-###EKS Service
+### EKS Service
 gateway가 아래와 같이 LoadBalnacer 역할을 수행한다  
 ![image](https://user-images.githubusercontent.com/20352446/120650224-889dc680-c4b8-11eb-8ea7-6ceff6ed57cf.png)
 
